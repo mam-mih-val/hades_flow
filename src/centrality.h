@@ -10,11 +10,14 @@
 class Centrality
 {
 public:
-  static Centrality* GetInstance(){
-    if(!instance_)
-      instance_ = new Centrality();
-    return instance_;
-  }
+  Centrality() :
+      centrality_5pc_(nullptr),
+      centrality_10pc_(nullptr){
+    LoadCentrality5pc();
+    LoadCentrality10pc();
+  };
+  ~Centrality() = default;
+
   double GetCentralityClass5pc(double multiplicity){
     auto bin = centrality_5pc_->FindBin(multiplicity);
     return centrality_5pc_->GetBinContent(bin) - 1.0;
@@ -95,14 +98,6 @@ public:
     centrality_10pc_->SetEntries(9);
   };
 private:
-  Centrality() :
-  centrality_5pc_(nullptr),
-  centrality_10pc_(nullptr){
-    LoadCentrality5pc();
-    LoadCentrality10pc();
-  };
-  ~Centrality() = default;
-  static Centrality* instance_;
   TH1F* centrality_5pc_;
   TH1F* centrality_10pc_;
 };

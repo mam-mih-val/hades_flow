@@ -37,6 +37,8 @@ add_definitions(${ROOT_CXX_FLAGS})
 
 set (SOURCES
         src/centrality.cc
+        src/acceptance_correction.cc
+        src/tools.cc
         )
 
 add_executable(correct src/correct.cc ${SOURCES} )
