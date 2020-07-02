@@ -2,7 +2,7 @@
 #include <chrono>
 #include <string>
 
-#include "src/correlate/CorrelationTask.h"
+#include <CorrelationTask.h>
 
 int main(int argc, char **argv) {
   using namespace std;

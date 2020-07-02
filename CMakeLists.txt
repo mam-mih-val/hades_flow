@@ -42,7 +42,6 @@ set (SOURCES
 add_executable(correct src/correct.cc ${SOURCES} )
 target_link_libraries(correct QnToolsCorrection QnToolsBase FlowCorrect FlowBase AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES})
 
-#add_executable(correlate Correlate.cpp ../correlate/CorrelationTask.cpp ../correlate/Utils.h ../correlate/Functions.h)
-#add_dependencies(correlate ${PROJECT_DEPENDENCIES})
-#target_link_libraries(correlate FlowBase Correction Base Correlation ${ROOT_LIBRARIES} ROOTVecOps)
+add_executable(correlate src/correlate.cc)
+target_link_libraries(correlate QnToolsBase FlowBase FlowCorrelate AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES})
 

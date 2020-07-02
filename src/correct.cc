@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
   AnalysisTree::Variable ones( "Ones" );
   Qn::QvectorTracksConfig un_reco("tracks_mdc", reco_phi, ones,
                                          {pt_axis, rapidity_axis});
-  un_reco.SetCorrectionSteps(true, true, true);
+  un_reco.SetCorrectionSteps(false, false, false);
   un_reco.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
   global_config->AddTrackQvector(un_reco);
 
