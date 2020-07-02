@@ -1,5 +1,5 @@
-#include "AnalysisTree/Cuts.h"
-#include "AnalysisTree/SimpleCut.h"
+#include "AnalysisTree/Cuts.hpp"
+#include "AnalysisTree/SimpleCut.hpp"
 
 namespace AnalysisTree{
 

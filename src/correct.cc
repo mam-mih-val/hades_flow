@@ -1,13 +1,10 @@
 #include <iostream>
 #include <chrono>
 
-//#include <TSystem.h>
 #include <GlobalConfig.h>
 
-#include <BranchReader.h>
 #include <CorrectTaskManager.h>
 
-//#include "HadesCuts.h"
 #include "centrality.h"
 #include "hades_cuts.h"
 
@@ -30,7 +27,6 @@ int main(int argc, char **argv) {
   Qn::Axis<double> pt_axis("pT", 16, 0.0, 1.6);
   Qn::Axis<double> rapidity_axis("rapidity", 15, -0.75f + beam_y, 0.75f + beam_y);
 
-//  global_config->SetEventCuts(AnalysisTree::GetHadesEventCuts(event_header));
   AnalysisTree::Variable centrality("Centrality", event_header,
                                     {"selected_tof_rpc_hits"},
                                     [](const std::vector<double> &var){
@@ -42,9 +38,8 @@ int main(int argc, char **argv) {
   AnalysisTree::Variable reco_phi( "phi", {{vtx_tracks, "phi"}}, [](const std::vector<double>& vars){
     return vars.at(0);
   } );
-  AnalysisTree::Variable reco_weight( "Ones" );
   AnalysisTree::Variable ones( "Ones" );
-  Qn::QvectorTracksConfig un_reco("tracks_mdc", reco_phi, {"Ones"},
+  Qn::QvectorTracksConfig un_reco("tracks_mdc", reco_phi, ones,
                                          {pt_axis, rapidity_axis});
   un_reco.SetCorrectionSteps(true, true, true);
   un_reco.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
