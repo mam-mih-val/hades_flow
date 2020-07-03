@@ -14,7 +14,7 @@ cd $job_num
 
 while read line; do
     echo $line >> list.txt
-done < $filelist1
+done < $filelist
 echo >> list.txt
 
 source /etc/profile.d/modules.sh
