@@ -21,6 +21,9 @@ source /etc/profile.d/modules.sh
 module use /cvmfs/it.gsi.de/modulefiles/
 module load compiler/gcc/9
 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lustre/nyx/hades/user/mmamaev/install/Flow/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lustre/nyx/hades/user/mmamaev/install/AnalysisTree/cxx17/lib
+
 echo "loading " $ownroot
 source $ownroot
 
