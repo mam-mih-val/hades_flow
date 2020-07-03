@@ -42,17 +42,17 @@ int main(int argc, char **argv) {
   AnalysisTree::Variable efficiency( "eff", {
       {vtx_tracks, "pT"},
       {vtx_tracks, "rapidity"},
-      {event_header, "selected_tof_rpc_hits"},
+//      {event_header, "selected_tof_rpc_hits"},
   }, []( const std::vector<double>& var ){
-                                      int cent_class = (int) Tools::Instance()->GetCentrality()->GetCentralityClass5pc(var.at(2));
+//                                      int cent_class = (int) Tools::Instance()->GetCentrality()->GetCentralityClass5pc(var.at(2));
                                       double pt = var.at(0);
                                       double y = var.at(1);
-                                      double eff = Tools::Instance()->GetCorrections()->GetEfficiency(cent_class, pt, y);
+                                      double eff = Tools::Instance()->GetCorrections()->GetEfficiency(0, pt, y);
                                       return 1.0/eff;
                                     } );
   Qn::QvectorTracksConfig un_reco("tracks_mdc", reco_phi, efficiency,
                                          {pt_axis, rapidity_axis});
-  un_reco.SetCorrectionSteps(false, false, false);
+  un_reco.SetCorrectionSteps(true, true, true);
   un_reco.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
   global_config->AddTrackQvector(un_reco);
 
