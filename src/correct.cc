@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv) {
   using namespace std;
-  if(argc < 2){
+  if(argc < 3){
     std::cout << "Error! Please use " << std::endl;
     std::cout << " ./correct filelist.txt path/to/efficiency.root" << std::endl;
     exit(EXIT_FAILURE);
