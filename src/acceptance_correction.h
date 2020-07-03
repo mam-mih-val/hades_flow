@@ -11,21 +11,32 @@
 
 class AcceptanceCorrection {
 public:
-  AcceptanceCorrection(){
-      Init();
-  };
+  AcceptanceCorrection() = default;
   virtual ~AcceptanceCorrection() = default;
   double GetEfficiency( int cent_class, double pt, double y ){
-    int bin = efficiency_maps_.at(cent_class).FindBin(pt, y);
-    return efficiency_maps_.at(cent_class).GetBinContent(bin);
+    try {
+      int bin = efficiency_maps_.at(cent_class).FindBin(pt, y);
+      return efficiency_maps_.at(cent_class).GetBinContent(bin);
+    } catch (const std::exception& exception) {
+      std::cout << "Error in AcceptanceCorrection::GetEfficiency()" << std::endl;
+      std::cout << "Efficiency maps are not initialized" << std::endl;
+      std::cout << exception.what() << std::endl;
+      abort();
+    }
   }
   double GetMismatch( int cent_class, double pt, double y ){
-    int bin = mismatch_maps_.at(cent_class).FindBin(pt, y);
-    return mismatch_maps_.at(cent_class).GetBinContent(bin);
+    try {
+      int bin = mismatch_maps_.at(cent_class).FindBin(pt, y);
+      return mismatch_maps_.at(cent_class).GetBinContent(bin);
+    }catch (const std::exception& exception) {
+      std::cout << "Error in AcceptanceCorrection::GetMismatch()" << std::endl;
+      std::cout << "Mismatch maps are not initialized" << std::endl;
+      std::cout << exception.what() << std::endl;
+      abort();
+    }
   }
-private:
-  void Init(){
-    auto* file = TFile::Open("../src/param/efficiency.root");
+  void ReadMaps(const std::string& file_name){
+    auto* file = TFile::Open(file_name.c_str());
     if( !file ){
       std::cout << "No param file for acceptance correction" << std::endl;
       abort();
@@ -50,6 +61,8 @@ private:
       percentile+=5;
     }
   }
+private:
+
   std::vector<TH2F> efficiency_maps_;
   std::vector<TH2F> mismatch_maps_;
 };

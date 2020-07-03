@@ -10,12 +10,14 @@
 
 int main(int argc, char **argv) {
   using namespace std;
-  if(argc < 2){
+  if(argc < 3){
     std::cout << "Error! Please use " << std::endl;
-    std::cout << " ./correct filelist.txt" << std::endl;
+    std::cout << " ./correct filelist.txt path/to/efficiency.root" << std::endl;
     exit(EXIT_FAILURE);
   }
   const string file_list = argv[1];
+  const string efficiency_path=argv[2];
+  Tools::Instance()->GetCorrections()->ReadMaps(efficiency_path);
 
   const string event_header = "event_header";
   const string vtx_tracks = "mdc_vtx_tracks";
