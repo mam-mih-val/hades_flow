@@ -40,6 +40,6 @@ $build_dir/correct list.txt /lustre/nyx/hades/user/mmamaev/hades_flow/src/param/
 mv correction_out.root correction_in.root
 
 echo "executing $build_dir/correlate correction_out.root"
-$build_dir/correlate correction_out.root
+$build_dir/correlate correction_in.root
 
 echo JOB FINISHED!
