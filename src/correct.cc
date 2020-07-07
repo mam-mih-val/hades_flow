@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
   const string vtx_tracks = "mdc_vtx_tracks";
   const string sim_tracks = "sim_tracks";
   const string sim_event = "sim_header";
+  const string wall_hits = "forward_wall_hits";
 
   const float beam_y = 0.74;  //TODO read from DataHeader
   // Configuration will be here
@@ -56,27 +57,44 @@ int main(int argc, char **argv) {
                                     } );
   Qn::QvectorTracksConfig un_reco("tracks_mdc", reco_phi, efficiency,
                                          {pt_axis, rapidity_axis});
-  un_reco.SetCorrectionSteps(true, true, true);
+  un_reco.SetCorrectionSteps(false, false, false);
   un_reco.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
   global_config->AddTrackQvector(un_reco);
 
-  AnalysisTree::Variable sim_phi( "sim_tracks", "phi" );
-  Qn::QvectorTracksConfig un_sim("sim_tracks", sim_phi, ones,
-                                         {pt_axis, rapidity_axis});
+//  AnalysisTree::Variable sim_phi( "sim_tracks", "phi" );
+//  Qn::QvectorTracksConfig un_sim("sim_tracks", sim_phi, ones,
+//                                         {pt_axis, rapidity_axis});
+//
+//  un_sim.SetCorrectionSteps(false, false, false);
+//  un_sim.AddCut({{"sim_tracks", "geant_pid"}},
+//                [](double pid) { return fabs(pid - 14.0) < 0.1; } );
+//  un_sim.AddCut( {{"sim_tracks", "is_primary"}},
+//                [](double flag) { return fabs(flag - 1.0) < 0.1; } );
+//  global_config->AddTrackQvector(un_sim);
+//
+//  AnalysisTree::Variable reaction_plane(sim_event, "reaction_plane");
+//
+//  Qn::QvectorConfig psi_rp("psi_rp", reaction_plane, ones);
+//  psi_rp.SetCorrectionSteps(false, false, false);
+//  global_config->SetPsiQvector(psi_rp);
 
-  un_sim.SetCorrectionSteps(false, false, false);
-  un_sim.AddCut({{"sim_tracks", "geant_pid"}},
-                [](double pid) { return fabs(pid - 14.0) < 0.1; } );
-  un_sim.AddCut( {{"sim_tracks", "is_primary"}},
-                [](double flag) { return fabs(flag - 1.0) < 0.1; } );
-  global_config->AddTrackQvector(un_sim);
+  AnalysisTree::Variable wall_phi(wall_hits, "phi");
+  AnalysisTree::Variable wall_charge(wall_hits, "signal");
+  Qn::QvectorTracksConfig qn_wall_full("wall_full", wall_phi, wall_charge,{});
+  qn_wall_full.SetCorrectionSteps(false, false, false);
+  global_config->AddTrackQvector(qn_wall_full);
 
-  AnalysisTree::Variable reaction_plane(sim_event, "reaction_plane");
+  Qn::QvectorTracksConfig qn_wall_sub1("wall_sub1", wall_phi, wall_charge,{});
+  qn_wall_sub1.SetCorrectionSteps(false, false, false);
+  qn_wall_sub1.AddCut({{wall_hits, "rnd_sub"}},
+                      [](double value){ return fabs(value-1.0) < 0.1;});
+  global_config->AddTrackQvector(qn_wall_sub1);
 
-  Qn::QvectorConfig psi_rp("psi_rp", reaction_plane, ones);
-
-  psi_rp.SetCorrectionSteps(false, false, false);
-  global_config->SetPsiQvector(psi_rp);
+  Qn::QvectorTracksConfig qn_wall_sub2("wall_sub2", wall_phi, wall_charge,{});
+  qn_wall_sub2.SetCorrectionSteps(false, false, false);
+  qn_wall_sub2.AddCut({{wall_hits, "rnd_sub"}},
+                      [](double value){ return fabs(value-0.0) < 0.1;});
+  global_config->AddTrackQvector(qn_wall_sub2);
 
  // ***********************************************
   // first filelist should contain DataHeader
@@ -90,7 +108,7 @@ int main(int argc, char **argv) {
   task_manager.AddTask(task);
   task_manager.Init();
   auto start = std::chrono::system_clock::now();
-  task_manager.Run(-1);
+  task_manager.Run(50000);
   task_manager.Finish();
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;

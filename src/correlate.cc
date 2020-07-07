@@ -16,9 +16,11 @@ int main(int argc, char **argv) {
   const std::string& file{argv[1]};
   CorrelationTask st(file, "tree");
 
-//  st.GetConfig()->SetNSamples();
+  st.AddQ1Q1Correlation("tracks_mdc", "wall_sub1");
+  st.AddQ1Q1Correlation("tracks_mdc", "wall_sub2");
 
-  std::cout << "go" << std::endl;
+  st.AddQ1Q1Correlation("wall_sub1", "wall_sub2");
+
   auto start = std::chrono::system_clock::now();
   st.Run();
   auto end = std::chrono::system_clock::now();
