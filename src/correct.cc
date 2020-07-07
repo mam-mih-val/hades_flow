@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
                                     } );
   Qn::QvectorTracksConfig un_reco("tracks_mdc", reco_phi, efficiency,
                                          {pt_axis, rapidity_axis});
-  un_reco.SetCorrectionSteps(false, false, false);
+  un_reco.SetCorrectionSteps(true, true, true);
   un_reco.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
   global_config->AddTrackQvector(un_reco);
 
@@ -81,17 +81,17 @@ int main(int argc, char **argv) {
   AnalysisTree::Variable wall_phi(wall_hits, "phi");
   AnalysisTree::Variable wall_charge(wall_hits, "signal");
   Qn::QvectorTracksConfig qn_wall_full("wall_full", wall_phi, wall_charge,{});
-  qn_wall_full.SetCorrectionSteps(false, false, false);
+  qn_wall_full.SetCorrectionSteps(true, false, false);
   global_config->AddTrackQvector(qn_wall_full);
 
   Qn::QvectorTracksConfig qn_wall_sub1("wall_sub1", wall_phi, wall_charge,{});
-  qn_wall_sub1.SetCorrectionSteps(false, false, false);
+  qn_wall_sub1.SetCorrectionSteps(true, false, false);
   qn_wall_sub1.AddCut({{wall_hits, "rnd_sub"}},
                       [](double value){ return fabs(value-1.0) < 0.1;});
   global_config->AddTrackQvector(qn_wall_sub1);
 
   Qn::QvectorTracksConfig qn_wall_sub2("wall_sub2", wall_phi, wall_charge,{});
-  qn_wall_sub2.SetCorrectionSteps(false, false, false);
+  qn_wall_sub2.SetCorrectionSteps(true, false, false);
   qn_wall_sub2.AddCut({{wall_hits, "rnd_sub"}},
                       [](double value){ return fabs(value-0.0) < 0.1;});
   global_config->AddTrackQvector(qn_wall_sub2);
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
   task_manager.AddTask(task);
   task_manager.Init();
   auto start = std::chrono::system_clock::now();
-  task_manager.Run(50000);
+  task_manager.Run(-1);
   task_manager.Finish();
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
