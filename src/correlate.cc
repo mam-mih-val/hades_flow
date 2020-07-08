@@ -19,6 +19,9 @@ int main(int argc, char **argv) {
   st.AddQ1Q1Correlation("tracks_mdc", "wall_sub1");
   st.AddQ1Q1Correlation("tracks_mdc", "wall_sub2");
 
+  st.AddQ1Q1Correlation("tracks_mdc_no_eff", "wall_sub1");
+  st.AddQ1Q1Correlation("tracks_mdc_no_eff", "wall_sub2");
+
   st.AddQ1Q1Correlation("wall_sub1", "wall_sub2");
 
   auto start = std::chrono::system_clock::now();

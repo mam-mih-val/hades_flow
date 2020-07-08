@@ -61,6 +61,12 @@ int main(int argc, char **argv) {
   un_reco.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
   global_config->AddTrackQvector(un_reco);
 
+  Qn::QvectorTracksConfig un_reco_no_eff("tracks_mdc_no_eff", reco_phi, ones,
+                                         {pt_axis, rapidity_axis});
+  un_reco_no_eff.SetCorrectionSteps(true, true, true);
+  un_reco_no_eff.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
+  global_config->AddTrackQvector(un_reco_no_eff);
+
 //  AnalysisTree::Variable sim_phi( "sim_tracks", "phi" );
 //  Qn::QvectorTracksConfig un_sim("sim_tracks", sim_phi, ones,
 //                                         {pt_axis, rapidity_axis});
