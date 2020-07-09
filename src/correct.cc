@@ -4,6 +4,7 @@
 #include <GlobalConfig.h>
 
 #include <CorrectTaskManager.h>
+#include <QnTools/Stats.hpp>
 
 #include "tools.h"
 #include "hades_cuts.h"
@@ -49,7 +50,7 @@ int main(int argc, char **argv) {
   }, []( const std::vector<double>& var ){
 //                                      int cent_class = (int) Tools::Instance()->GetCentrality()->GetCentralityClass5pc(var.at(2));
                                       double pt = var.at(0);
-                                      double y = var.at(1);
+                                      double y = var.at(1) - 0.74; // to CM
                                       double eff = Tools::Instance()->GetCorrections()->GetEfficiency(0, pt, y);
                                       if( eff == 0.0 )
                                         return 0.0;
@@ -59,12 +60,14 @@ int main(int argc, char **argv) {
                                          {pt_axis, rapidity_axis});
   un_reco.SetCorrectionSteps(true, true, true);
   un_reco.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
+  un_reco.SetType(Qn::Stats::Weights::OBSERVABLE);
   global_config->AddTrackQvector(un_reco);
 
   Qn::QvectorTracksConfig un_reco_no_eff("tracks_mdc_no_eff", reco_phi, ones,
                                          {pt_axis, rapidity_axis});
   un_reco_no_eff.SetCorrectionSteps(true, true, true);
   un_reco_no_eff.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")}, [](double pid) { return abs(pid - 14.0) < 0.1; } );
+  un_reco_no_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
   global_config->AddTrackQvector(un_reco_no_eff);
 
 //  AnalysisTree::Variable sim_phi( "sim_tracks", "phi" );
@@ -77,7 +80,7 @@ int main(int argc, char **argv) {
 //  un_sim.AddCut( {{"sim_tracks", "is_primary"}},
 //                [](double flag) { return fabs(flag - 1.0) < 0.1; } );
 //  global_config->AddTrackQvector(un_sim);
-//
+
 //  AnalysisTree::Variable reaction_plane(sim_event, "reaction_plane");
 //
 //  Qn::QvectorConfig psi_rp("psi_rp", reaction_plane, ones);
@@ -86,9 +89,9 @@ int main(int argc, char **argv) {
 
   AnalysisTree::Variable wall_phi(wall_hits, "phi");
   AnalysisTree::Variable wall_charge(wall_hits, "signal");
-  Qn::QvectorTracksConfig qn_wall_full("wall_full", wall_phi, wall_charge,{});
-  qn_wall_full.SetCorrectionSteps(true, false, false);
-  global_config->AddTrackQvector(qn_wall_full);
+//  Qn::QvectorTracksConfig qn_wall_full("wall_full", wall_phi, wall_charge,{});
+//  qn_wall_full.SetCorrectionSteps(false, false, false);
+//  global_config->AddTrackQvector(qn_wall_full);
 
   Qn::QvectorTracksConfig qn_wall_sub1("wall_sub1", wall_phi, wall_charge,{});
   qn_wall_sub1.SetCorrectionSteps(true, false, false);
@@ -109,12 +112,13 @@ int main(int argc, char **argv) {
 
   task_manager.AddBranchCut(AnalysisTree::GetHadesTrackCuts(vtx_tracks));
   task_manager.AddBranchCut(AnalysisTree::GetHadesEventCuts(event_header));
+  task_manager.AddBranchCut(AnalysisTree::GetHadesWallHitsCuts(wall_hits));
 
   auto* task = new Qn::CorrectionTask(global_config);
   task_manager.AddTask(task);
   task_manager.Init();
   auto start = std::chrono::system_clock::now();
-  task_manager.Run(-1);
+  task_manager.Run(50000);
   task_manager.Finish();
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;

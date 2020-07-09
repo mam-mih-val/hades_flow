@@ -15,7 +15,7 @@ public:
   virtual ~AcceptanceCorrection() = default;
   double GetEfficiency( int cent_class, double pt, double y ){
     try {
-      int bin = efficiency_maps_.at(cent_class).FindBin(pt, y-0.74);
+      int bin = efficiency_maps_.at(cent_class).FindBin(pt, y);
       return efficiency_maps_.at(cent_class).GetBinContent(bin);
     } catch (const std::exception& exception) {
       std::cout << "Error in AcceptanceCorrection::GetEfficiency()" << std::endl;
@@ -26,7 +26,7 @@ public:
   }
   double GetMismatch( int cent_class, double pt, double y ){
     try {
-      int bin = mismatch_maps_.at(cent_class).FindBin(pt, y-0.74);
+      int bin = mismatch_maps_.at(cent_class).FindBin(pt, y);
       return mismatch_maps_.at(cent_class).GetBinContent(bin);
     }catch (const std::exception& exception) {
       std::cout << "Error in AcceptanceCorrection::GetMismatch()" << std::endl;
