@@ -97,12 +97,14 @@ int main(int argc, char **argv) {
   qn_wall_sub1.SetCorrectionSteps(true, false, false);
   qn_wall_sub1.AddCut({{wall_hits, "rnd_sub"}},
                       [](double value){ return fabs(value-1.0) < 0.1;});
+  qn_wall_sub1.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_sub1);
 
   Qn::QvectorTracksConfig qn_wall_sub2("wall_sub2", wall_phi, wall_charge,{});
   qn_wall_sub2.SetCorrectionSteps(true, false, false);
   qn_wall_sub2.AddCut({{wall_hits, "rnd_sub"}},
                       [](double value){ return fabs(value-0.0) < 0.1;});
+  qn_wall_sub1.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_sub2);
 
  // ***********************************************
