@@ -70,22 +70,22 @@ int main(int argc, char **argv) {
   un_reco_no_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
   global_config->AddTrackQvector(un_reco_no_eff);
 
-//  AnalysisTree::Variable sim_phi( "sim_tracks", "phi" );
-//  Qn::QvectorTracksConfig un_sim("sim_tracks", sim_phi, ones,
-//                                         {pt_axis, rapidity_axis});
-//
-//  un_sim.SetCorrectionSteps(false, false, false);
-//  un_sim.AddCut({{"sim_tracks", "geant_pid"}},
-//                [](double pid) { return fabs(pid - 14.0) < 0.1; } );
-//  un_sim.AddCut( {{"sim_tracks", "is_primary"}},
-//                [](double flag) { return fabs(flag - 1.0) < 0.1; } );
-//  global_config->AddTrackQvector(un_sim);
+  AnalysisTree::Variable sim_phi( "sim_tracks", "phi" );
+  Qn::QvectorTracksConfig un_sim("sim_tracks", sim_phi, ones,
+                                         {pt_axis, rapidity_axis});
 
-//  AnalysisTree::Variable reaction_plane(sim_event, "reaction_plane");
-//
-//  Qn::QvectorConfig psi_rp("psi_rp", reaction_plane, ones);
-//  psi_rp.SetCorrectionSteps(false, false, false);
-//  global_config->SetPsiQvector(psi_rp);
+  un_sim.SetCorrectionSteps(false, false, false);
+  un_sim.AddCut({{"sim_tracks", "geant_pid"}},
+                [](double pid) { return fabs(pid - 14.0) < 0.1; } );
+  un_sim.AddCut( {{"sim_tracks", "is_primary"}},
+                [](double flag) { return fabs(flag - 1.0) < 0.1; } );
+  global_config->AddTrackQvector(un_sim);
+
+  AnalysisTree::Variable reaction_plane(sim_event, "reaction_plane");
+
+  Qn::QvectorConfig psi_rp("psi_rp", reaction_plane, ones);
+  psi_rp.SetCorrectionSteps(false, false, false);
+  global_config->SetPsiQvector(psi_rp);
 
   AnalysisTree::Variable wall_phi(wall_hits, "phi");
   AnalysisTree::Variable wall_charge(wall_hits, "signal");
