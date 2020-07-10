@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
   task_manager.AddTask(task);
   task_manager.Init();
   auto start = std::chrono::system_clock::now();
-  task_manager.Run(500000);
+  task_manager.Run(50000);
   task_manager.Finish();
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
