@@ -16,11 +16,11 @@ int main(int argc, char **argv) {
   const std::string& file{argv[1]};
   CorrelationTask st(file, "tree");
 
-  st.AddQ1Q1Correlation("tracks_mdc", "wall_sub1", CorrelationTask::Q1Q1_CORRELATION_TYPES::u1Q1_EVENT_PLANE);
+  st.AddQ1Q1Correlation("tracks_mdc", "wall_sub1", CorrelationTask::u1Q1_EVENT_PLANE);
   st.AddQ1Q1Correlation("tracks_mdc", "wall_sub2", CorrelationTask::u1Q1_EVENT_PLANE);
 
-  st.AddQ1Q1Correlation("tracks_mdc_no_eff", "wall_sub1", CorrelationTask::Q1Q1_CORRELATION_TYPES::u1Q1_EVENT_PLANE);
-  st.AddQ1Q1Correlation("tracks_mdc_no_eff", "wall_sub2", CorrelationTask::Q1Q1_CORRELATION_TYPES::u1Q1_EVENT_PLANE);
+  st.AddQ1Q1Correlation("tracks_mdc_no_eff", "wall_sub1", CorrelationTask::u1Q1_EVENT_PLANE);
+  st.AddQ1Q1Correlation("tracks_mdc_no_eff", "wall_sub2", CorrelationTask::u1Q1_EVENT_PLANE);
 
   st.AddQ1Q1Correlation("wall_sub1", "wall_sub2", CorrelationTask::Q1Q1_EVENT_PLANE);
 
