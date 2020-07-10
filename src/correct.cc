@@ -79,12 +79,14 @@ int main(int argc, char **argv) {
                 [](double pid) { return fabs(pid - 14.0) < 0.1; } );
   un_sim.AddCut( {{"sim_tracks", "is_primary"}},
                 [](double flag) { return fabs(flag - 1.0) < 0.1; } );
+  un_sim.SetType(Qn::Stats::Weights::OBSERVABLE);
   global_config->AddTrackQvector(un_sim);
 
   AnalysisTree::Variable reaction_plane(sim_event, "reaction_plane");
 
   Qn::QvectorConfig psi_rp("psi_rp", reaction_plane, ones);
   psi_rp.SetCorrectionSteps(false, false, false);
+  psi_rp.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->SetPsiQvector(psi_rp);
 
   AnalysisTree::Variable wall_phi(wall_hits, "phi");
