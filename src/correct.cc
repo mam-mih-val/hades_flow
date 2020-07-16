@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
                                     {"selected_tof_rpc_hits"},
                                     [](const std::vector<double> &var){
                                       return Tools::Instance()->GetCentrality()->GetCentrality(
-            var.at(0), Centrality::DATA::AuAu_1_23AGeV);
+            var.at(0), Centrality::DATA::AgAg_1_23AGeV);
                                     });
 
   auto* global_config = new Qn::GlobalConfig();
@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
   task_manager.AddTask(task);
   task_manager.Init();
   auto start = std::chrono::system_clock::now();
-  task_manager.Run(1000);
+  task_manager.Run(-1);
   task_manager.Finish();
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;

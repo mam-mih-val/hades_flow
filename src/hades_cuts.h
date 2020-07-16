@@ -36,7 +36,7 @@ Cuts* GetHadesEventCuts(const std::string& branch, const std::string& name="Hade
 Cuts* GetHadesTrackCuts(const std::string& branch, const std::string& name="HadesGoodVertexTrack") {
   Cuts* vertex_tracks_cuts = new Cuts(name);
   SimpleCut dca_xy_cut({branch,"dca_xy"}, 0, 10);
-  SimpleCut dca_z_cut({branch,"dca_z"}, 0, 10);
+  SimpleCut dca_z_cut({branch,"dca_z"}, -10, 10);
   SimpleCut chi2_rk_cut({branch,"chi2"}, 0, 100);
 
   vertex_tracks_cuts->AddCuts({
