@@ -60,13 +60,13 @@ Cuts* GetHadesWallHitsCuts(const std::string& branch, const std::string& name="H
   SimpleCut ring_by_ring_cuts({{branch,"ring"}, {branch,"beta"}, {branch,"signal"}},
                               []( std::vector<double> vars ){
                                 if(  1.0 <= vars.at(0) && vars.at(0) <= 5 )
-                                  return vars.at(1) > 0.84
+                                  return vars.at(1) > 0.55
                                       && vars.at(2) > 80.0;
                                 if( vars.at(0) >= 6.0 && vars.at(0) <= 7.0 )
-                                  return vars.at(1) > 0.85
+                                  return vars.at(1) > 0.55
                                       && vars.at(2) > 85.0;
                                 if(  8.0 <= vars.at(0) && vars.at(0) <= 10.0 )
-                                  return vars.at(1) > 0.80
+                                  return vars.at(1) > 0.55
                                       && vars.at(2) > 88.0;
                                 return false;
                               });
