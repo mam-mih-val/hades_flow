@@ -16,13 +16,19 @@ int main(int argc, char **argv) {
   const std::string& file{argv[1]};
   CorrelationTask st(file, "tree");
 
-  st.AddQ1Q1Correlation("tracks_mdc", "wall_sub1", CorrelationTask::u1Q1_EVENT_PLANE);
-  st.AddQ1Q1Correlation("tracks_mdc", "wall_sub2", CorrelationTask::u1Q1_EVENT_PLANE);
+  st.AddQ1Q1Correlation("u", "W1", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("u", "W2", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("u", "W3", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("u", "M", CorrelationTask::SCALAR_PRODUCT);
 
-  st.AddQ1Q1Correlation("tracks_mdc_no_eff", "wall_sub1", CorrelationTask::u1Q1_EVENT_PLANE);
-  st.AddQ1Q1Correlation("tracks_mdc_no_eff", "wall_sub2", CorrelationTask::u1Q1_EVENT_PLANE);
+  st.AddQ1Q1Correlation("W1", "W2", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("W1", "W3", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("W2", "W3", CorrelationTask::SCALAR_PRODUCT);
 
-  st.AddQ1Q1Correlation("wall_sub1", "wall_sub2", CorrelationTask::Q1Q1_EVENT_PLANE);
+  st.AddQ1Q1Correlation("M", "W1", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("M", "W2", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("M", "W3", CorrelationTask::SCALAR_PRODUCT);
+
 
   auto start = std::chrono::system_clock::now();
   st.Run();

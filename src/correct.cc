@@ -11,7 +11,7 @@
 
 int main(int argc, char **argv) {
   using namespace std;
-  if(argc < 3){
+  if(argc < 2){
     std::cout << "Error! Please use " << std::endl;
     std::cout << " ./correct filelist.txt path/to/efficiency.root" << std::endl;
     exit(EXIT_FAILURE);
@@ -34,93 +34,70 @@ int main(int argc, char **argv) {
   AnalysisTree::Variable centrality("Centrality", event_header,
                                     {"selected_tof_rpc_hits"},
                                     [](const std::vector<double> &var){
-                                      return Tools::Instance()->GetCentrality()->GetCentrality5pc(var.at(0));
+                                      return Tools::Instance()->GetCentrality()->GetCentrality(
+            var.at(0), Centrality::DATA::AuAu_1_23AGeV);
                                     });
+
   auto* global_config = new Qn::GlobalConfig();
   global_config->AddEventVar(centrality);
   global_config->AddCorrectionAxis( {"Centrality", 8, 0.0, 40.0} );
-
-  AnalysisTree::Variable ones( "Ones" );
-  AnalysisTree::Variable efficiency( "eff", {
-      {vtx_tracks, "pT"},
-      {vtx_tracks, "rapidity"},
-//      {event_header, "selected_tof_rpc_hits"},
-  }, [beam_y]( const std::vector<double>& var ){
-//                                      int cent_class = (int) Tools::Instance()->GetCentrality()->GetCentralityClass5pc(var.at(2));
-                                      double pt = var.at(0);
-                                      double y = var.at(1) - beam_y; // to CM
-                                      double eff = Tools::Instance()->GetCorrections()->GetEfficiency(0, pt, y);
-                                      if( eff == 0.0 )
-                                        return 0.0;
-                                      return 1.0/eff;
-                                    } );
-  Qn::QvectorTracksConfig un_reco("tracks_mdc",
-                                  {vtx_tracks, "phi"}, efficiency,
+  // un-vector from MDC
+  Qn::QvectorTracksConfig un_vector("u",
+                                  {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  un_reco.SetCorrectionSteps(true, true, true);
-  un_reco.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")},
+  un_vector.SetCorrectionSteps(true, true, true);
+  un_vector.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")},
                  [](double pid) { return abs(pid - 14.0) < 0.1; } );
-  un_reco.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(un_reco);
+  un_vector.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")},
+                 [](double pid) { return abs(pid - 14.0) < 0.1; } );
+  un_vector.SetType(Qn::Stats::Weights::OBSERVABLE);
+  global_config->AddTrackQvector(un_vector);
 
-  Qn::QvectorTracksConfig un_reco_no_eff("tracks_mdc_no_eff",
-                                         {vtx_tracks, "phi"},
-                                         {"Ones"},
-                                         {pt_axis, rapidity_axis});
-  un_reco_no_eff.SetCorrectionSteps(true, true, true);
-  un_reco_no_eff.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")},
-                        [](double pid) { return abs(pid - 14.0) < 0.1; } );
-  un_reco_no_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(un_reco_no_eff);
-
-
-  Qn::QvectorTracksConfig un_sim(sim_tracks, {sim_tracks, "phi"},
-                                 {"Ones"},
-                                 {pt_axis, rapidity_axis});
-
-  un_sim.SetCorrectionSteps(false, false, false);
-  un_sim.AddCut({{sim_tracks, "geant_pid"}},
-                [](double pid) { return fabs(pid - 14.0) < 0.1; } );
-  un_sim.AddCut( {{sim_tracks, "is_primary"}},
-                [](double flag) { return fabs(flag - 1.0) < 0.1; } );
-  un_sim.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(un_sim);
-
-  Qn::QvectorConfig psi_rp("psi_rp", {sim_event, "reaction_plane"},
-                           {"Ones"});
-  psi_rp.SetCorrectionSteps(false, false, false);
-  psi_rp.SetType(Qn::Stats::Weights::REFERENCE);
-  global_config->SetPsiQvector(psi_rp);
-
-  AnalysisTree::Variable wall_phi(wall_hits, "phi");
-  AnalysisTree::Variable wall_charge(wall_hits, "signal");
-
-  Qn::QvectorTracksConfig qn_wall_sub1("wall_sub1", {wall_hits, "phi"},
+  // Q-vectors from Forward Wall
+  Qn::QvectorTracksConfig qn_wall_1("W1", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_sub1.SetCorrectionSteps(true, false, false);
-  qn_wall_sub1.AddCut({{wall_hits, "rnd_sub"}},
-                      [](double value){ return fabs(value-1.0) < 0.1;});
-  qn_wall_sub1.SetType(Qn::Stats::Weights::REFERENCE);
-  global_config->AddTrackQvector(qn_wall_sub1);
+  qn_wall_1.SetCorrectionSteps(true, false, false);
+  qn_wall_1.AddCut({{wall_hits, "ring"}},
+                      [](double value){ return 1.0 <= value && value <= 5.0;});
+  qn_wall_1.SetType(Qn::Stats::Weights::REFERENCE);
+  global_config->AddTrackQvector(qn_wall_1);
 
-  Qn::QvectorTracksConfig qn_wall_sub2("wall_sub2", {wall_hits, "phi"},
+  Qn::QvectorTracksConfig qn_wall_2("W2", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_sub2.SetCorrectionSteps(true, false, false);
-  qn_wall_sub2.AddCut({{wall_hits, "rnd_sub"}},
-                      [](double value){ return fabs(value-0.0) < 0.1;});
-  qn_wall_sub1.SetType(Qn::Stats::Weights::REFERENCE);
-  global_config->AddTrackQvector(qn_wall_sub2);
+  qn_wall_2.SetCorrectionSteps(true, false, false);
+  qn_wall_2.AddCut({{wall_hits, "ring"}},
+                      [](double value){ return 6.0 <= value && value <= 7.0;});
+  qn_wall_2.SetType(Qn::Stats::Weights::REFERENCE);
+  global_config->AddTrackQvector(qn_wall_2);
+
+  Qn::QvectorTracksConfig qn_wall_3("W3", {wall_hits, "phi"},
+                                       {wall_hits, "signal"},{});
+  qn_wall_3.SetCorrectionSteps(true, false, false);
+  qn_wall_3.AddCut({{wall_hits, "ring"}},
+                      [](double value){ return 8.0 <= value && value <= 10.0;});
+  qn_wall_3.SetType(Qn::Stats::Weights::REFERENCE);
+  global_config->AddTrackQvector(qn_wall_3);
+  // Q-vector from MDC
+  Qn::QvectorTracksConfig qn_mdc("M",
+                                    {vtx_tracks, "phi"}, {"Ones"},
+                                    {rapidity_axis});
+  qn_mdc.SetCorrectionSteps(true, true, true);
+  qn_mdc.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid")},
+                    [](double pid) { return abs(pid - 14.0) < 0.1; } );
+  qn_mdc.SetType(Qn::Stats::Weights::REFERENCE);
+  global_config->AddTrackQvector(qn_mdc);
 
  // ***********************************************
   // first filelist should contain DataHeader
 
   Qn::CorrectTaskManager task_manager({file_list}, {"hades_analysis_tree"});
+  auto* task = new Qn::CorrectionTask(global_config);
 
   task_manager.AddBranchCut(AnalysisTree::GetHadesTrackCuts(vtx_tracks));
   task_manager.AddBranchCut(AnalysisTree::GetHadesEventCuts(event_header));
   task_manager.AddBranchCut(AnalysisTree::GetHadesWallHitsCuts(wall_hits));
 
-  auto* task = new Qn::CorrectionTask(global_config);
+
   task_manager.AddTask(task);
   task_manager.Init();
   auto start = std::chrono::system_clock::now();

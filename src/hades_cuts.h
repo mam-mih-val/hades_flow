@@ -38,11 +38,13 @@ Cuts* GetHadesTrackCuts(const std::string& branch, const std::string& name="Hade
   SimpleCut dca_xy_cut({branch,"dca_xy"}, 0, 10);
   SimpleCut dca_z_cut({branch,"dca_z"}, 0, 10);
   SimpleCut chi2_rk_cut({branch,"chi2"}, 0, 100);
+  SimpleCut pt_cut({branch,"pT"}, 1.0, 1.2);
 
   vertex_tracks_cuts->AddCuts({
       dca_xy_cut,
       dca_z_cut,
       chi2_rk_cut,
+      pt_cut
   });
   return vertex_tracks_cuts;
 };
