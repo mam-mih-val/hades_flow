@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
   const std::string& file{argv[1]};
   CorrelationTask st(file, "tree");
 
+
   st.AddQ1Q1Correlation("u", "W1", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("u", "W2", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("u", "W3", CorrelationTask::SCALAR_PRODUCT);
@@ -28,6 +29,8 @@ int main(int argc, char **argv) {
   st.AddQ1Q1Correlation("M", "W1", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("M", "W2", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("M", "W3", CorrelationTask::SCALAR_PRODUCT);
+
+  st.AddQ1Q1Correlation("M", "M", CorrelationTask::SCALAR_PRODUCT);
 
 
   auto start = std::chrono::system_clock::now();
