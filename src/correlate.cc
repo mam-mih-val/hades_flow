@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
   const std::string& file{argv[1]};
   CorrelationTask st(file, "tree");
-
+  st.SetNonZeroOnly(false);
 
   st.AddQ1Q1Correlation("u", "W1", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("u", "W2", CorrelationTask::SCALAR_PRODUCT);
