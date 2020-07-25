@@ -94,6 +94,9 @@ int main(int argc, char **argv) {
   task->AddQAHistogram("u", {{vtx_tracks + "_rapidity", 200, -0.75+beam_y, 0.75+beam_y},
                            {vtx_tracks + "_pT", 200, 0.0, 2.0}});
 
+  task->AddQAHistogram("u", {{vtx_tracks + "_pT", 200, 0.0, 2.0},
+                             {vtx_tracks + "_phi", 315, -3.15, 3.15}});
+
   task->AddQAHistogram("u", {{vtx_tracks + "_rapidity", 100, -0.75+beam_y, 0.75+beam_y},
                            {vtx_tracks + "_phi", 315, -3.15, 3.15}});
 
