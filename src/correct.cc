@@ -6,6 +6,8 @@
 #include <CorrectTaskManager.h>
 #include <QnTools/Stats.hpp>
 
+#include <AnalysisTree/Variable.hpp>
+
 #include "tools.h"
 #include "hades_cuts.h"
 
@@ -36,7 +38,7 @@ int main(int argc, char **argv) {
                                     {{event_header, "selected_tof_rpc_hits"}},
                                     [](const std::vector<double> &var){
                                       return Tools::Instance()->GetCentrality()->GetCentrality(
-            var.at(0), Centrality::DATA::AgAg_1_23AGeV);});
+            var.at(0), Centrality::DATA::AuAu_1_23AGeV);});
 
   auto* global_config = new Qn::GlobalConfig();
   global_config->AddEventVar(centrality);
@@ -56,7 +58,7 @@ int main(int argc, char **argv) {
                                        {wall_hits, "signal"},{});
   qn_wall_1.SetCorrectionSteps(true, false, false);
   qn_wall_1.AddCut({{wall_hits, "ring"}},
-                      [](double value){ return 2.0 <= value && value <= 5.0;});
+                      [](double value){ return 1.0 <= value && value <= 5.0;});
   qn_wall_1.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_1);
 
@@ -90,6 +92,8 @@ int main(int argc, char **argv) {
 
   Qn::CorrectTaskManager task_manager({file_list}, {"hades_analysis_tree"});
   auto* task = new Qn::CorrectionTask(global_config);
+
+  AnalysisTree::Variable eta(vtx_tracks, "eta");
 
   task->AddQAHistogram("u", {{vtx_tracks + "_rapidity", 200, -0.75+beam_y, 0.75+beam_y},
                            {vtx_tracks + "_pT", 200, 0.0, 2.0}});

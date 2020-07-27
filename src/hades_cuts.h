@@ -35,7 +35,7 @@ Cuts* GetHadesEventCuts(const std::string& branch, const std::string& name="Hade
 
 Cuts* GetHadesTrackCuts(const std::string& branch, const std::string& name="HadesGoodVertexTrack") {
   Cuts* vertex_tracks_cuts = new Cuts(name);
-  SimpleCut dca_xy_cut({branch,"dca_xy"}, 0, 10);
+  SimpleCut dca_xy_cut({branch,"dca_xy"}, -10, 10);
   SimpleCut dca_z_cut({branch,"dca_z"}, -10, 10);
   SimpleCut chi2_rk_cut({branch,"chi2"}, 0, 100);
 
@@ -60,13 +60,13 @@ Cuts* GetHadesWallHitsCuts(const std::string& branch, const std::string& name="H
   SimpleCut ring_by_ring_cuts({{branch,"ring"}, {branch,"beta"}, {branch,"signal"}},
                               []( std::vector<double> vars ){
                                 if(  1.0 <= vars.at(0) && vars.at(0) <= 5 )
-                                  return vars.at(1) > 0.55
+                                  return vars.at(1) > 0.84
                                       && vars.at(2) > 80.0;
                                 if( vars.at(0) >= 6.0 && vars.at(0) <= 7.0 )
-                                  return vars.at(1) > 0.55
+                                  return vars.at(1) > 0.85
                                       && vars.at(2) > 85.0;
                                 if(  8.0 <= vars.at(0) && vars.at(0) <= 10.0 )
-                                  return vars.at(1) > 0.55
+                                  return vars.at(1) > 0.80
                                       && vars.at(2) > 88.0;
                                 return false;
                               });
