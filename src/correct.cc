@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
                                     {{event_header, "selected_tof_rpc_hits"}},
                                     [](const std::vector<double> &var){
                                       return Tools::Instance()->GetCentrality()->GetCentrality(
-            var.at(0), Centrality::DATA::AuAu_1_23AGeV);});
+            var.at(0), Centrality::DATA::AgAg_1_23AGeV);});
 
   auto* global_config = new Qn::GlobalConfig();
   global_config->AddEventVar(centrality);
