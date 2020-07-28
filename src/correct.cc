@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
                                        {wall_hits, "signal"},{});
   qn_wall_1.SetCorrectionSteps(true, false, false);
   qn_wall_1.AddCut({{wall_hits, "ring"}},
-                      [](double value){ return 1.0 <= value && value <= 5.0;});
+                      [](double value){ return 2.0 <= value && value <= 5.0;});
   qn_wall_1.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_1);
 
