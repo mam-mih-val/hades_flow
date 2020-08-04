@@ -8,8 +8,8 @@
 
 #include <AnalysisTree/Variable.hpp>
 
-#include "tools.h"
-#include "hades_cuts.h"
+#include <centrality.h>
+#include <cuts.h>
 
 int main(int argc, char **argv) {
   using namespace std;
@@ -31,14 +31,11 @@ int main(int argc, char **argv) {
   Qn::Axis<double> pt_axis("pT", 16, 0.0, 1.6);
   Qn::Axis<double> rapidity_axis("rapidity", 15, -0.75 + beam_y, 0.75 + beam_y);
 
-  AnalysisTree::Variable y_cm( "y_cm", {{vtx_tracks, "rapidity"}},
-                               [beam_y](const std::vector<double> &var){
-                                 return  var.at(0) - beam_y;});
   AnalysisTree::Variable centrality("Centrality",
                                     {{event_header, "selected_tof_rpc_hits"}},
                                     [](const std::vector<double> &var){
-                                      return Tools::Instance()->GetCentrality()->GetCentrality(
-            var.at(0), Centrality::DATA::AgAg_1_23AGeV);});
+                                      return HadesUtils::Centrality::GetValue(var.at(0),
+                                                                              HadesUtils::DATA_TYPE::AgAg_1_23AGeV);});
 
   auto* global_config = new Qn::GlobalConfig();
   global_config->AddEventVar(centrality);
@@ -77,6 +74,25 @@ int main(int argc, char **argv) {
                       [](double value){ return 8.0 <= value && value <= 10.0;});
   qn_wall_3.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_3);
+
+  Qn::QvectorTracksConfig qn_rs1("R1", {wall_hits, "phi"},
+                                       {wall_hits, "signal"},{});
+  qn_rs1.SetCorrectionSteps(true, false, false);
+  qn_rs1.AddCut({{wall_hits, "rnd_sub"}},
+                      [](double value){ return fabs(value - 0.0) < 0.1;});
+  qn_rs1.SetType(Qn::Stats::Weights::REFERENCE);
+  global_config->AddTrackQvector(qn_rs1);
+  Qn::QvectorTracksConfig qn_rs2("R2", {wall_hits, "phi"},
+                                       {wall_hits, "signal"},{});
+  qn_rs2.SetCorrectionSteps(true, false, false);
+  qn_rs2.AddCut({{wall_hits, "rnd_sub"}},
+                      [](double value){ return fabs(value - 1.0) < 0.1;});
+
+  Qn::QvectorTracksConfig qn_full("F", {wall_hits, "phi"},
+                                       {wall_hits, "signal"},{});
+  qn_full.SetCorrectionSteps(true, false, false);
+  qn_full.SetType(Qn::Stats::Weights::REFERENCE);
+  global_config->AddTrackQvector(qn_full);
   // Q-vector from MDC
   Qn::QvectorTracksConfig qn_mdc("M",
                                     {vtx_tracks, "phi"}, {"Ones"},
@@ -104,15 +120,19 @@ int main(int argc, char **argv) {
   task->AddQAHistogram("u", {{vtx_tracks + "_rapidity", 100, -0.75+beam_y, 0.75+beam_y},
                            {vtx_tracks + "_phi", 315, -3.15, 3.15}});
 
-  task_manager.AddBranchCut(AnalysisTree::GetHadesTrackCuts(vtx_tracks));
-  task_manager.AddBranchCut(AnalysisTree::GetHadesEventCuts(event_header));
-  task_manager.AddBranchCut(AnalysisTree::GetHadesWallHitsCuts(wall_hits));
-
+  task_manager.SetEventCuts(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::EVENT_HEADER,
+                                                  HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
+  task_manager.AddBranchCut(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::MDC_TRACKS,
+                                                  HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
+  task_manager.AddBranchCut(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::META_HITS,
+                                                  HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
+  task_manager.AddBranchCut(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::WALL_HITS,
+                                                  HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
 
   task_manager.AddTask(task);
   task_manager.Init();
   auto start = std::chrono::system_clock::now();
-  task_manager.Run(-1);
+  task_manager.Run(50000);
   task_manager.Finish();
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;

@@ -20,11 +20,13 @@ int main(int argc, char **argv) {
   st.AddQ1Q1Correlation("u", "W1", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("u", "W2", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("u", "W3", CorrelationTask::SCALAR_PRODUCT);
-  st.AddQ1Q1Correlation("u", "M", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("u", "F", CorrelationTask::SCALAR_PRODUCT);
 
   st.AddQ1Q1Correlation("W1", "W2", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("W1", "W3", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("W2", "W3", CorrelationTask::SCALAR_PRODUCT);
+  st.AddQ1Q1Correlation("R1", "R2", CorrelationTask::SCALAR_PRODUCT);
+
 
   st.AddQ1Q1Correlation("M", "W1", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("M", "W2", CorrelationTask::SCALAR_PRODUCT);
