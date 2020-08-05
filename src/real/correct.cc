@@ -87,6 +87,7 @@ int main(int argc, char **argv) {
   qn_rs2.SetCorrectionSteps(true, false, false);
   qn_rs2.AddCut({{wall_hits, "rnd_sub"}},
                       [](double value){ return fabs(value - 1.0) < 0.1;});
+  global_config->AddTrackQvector(qn_rs2);
 
   Qn::QvectorTracksConfig qn_full("F", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
@@ -132,7 +133,7 @@ int main(int argc, char **argv) {
   task_manager.AddTask(task);
   task_manager.Init();
   auto start = std::chrono::system_clock::now();
-  task_manager.Run(-1);
+  task_manager.Run(1000);
   task_manager.Finish();
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
