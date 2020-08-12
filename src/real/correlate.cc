@@ -27,13 +27,11 @@ int main(int argc, char **argv) {
   st.AddQ1Q1Correlation("W2", "W3", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("R1", "R2", CorrelationTask::Q1Q1_EVENT_PLANE);
 
-
   st.AddQ1Q1Correlation("M", "W1", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("M", "W2", CorrelationTask::SCALAR_PRODUCT);
   st.AddQ1Q1Correlation("M", "W3", CorrelationTask::SCALAR_PRODUCT);
 
   st.AddQ1Q1Correlation("M", "M", CorrelationTask::SCALAR_PRODUCT);
-
 
   auto start = std::chrono::system_clock::now();
   st.Run();
