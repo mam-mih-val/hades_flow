@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
 
   task_manager.AddTask(task);
   task_manager.Init();
-  task_manager.Run(50000);
+  task_manager.Run(-1);
   task_manager.Finish();
   return 0;
 }
