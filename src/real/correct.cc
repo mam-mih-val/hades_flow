@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
   // un-vector from MDC
   Qn::QvectorTracksConfig un_vector("u",{vtx_tracks, "phi"}, {"Ones"},
                                     {pt_axis,rapidity_axis});
-  un_vector.SetCorrectionSteps(true, false, false);
+  un_vector.SetCorrectionSteps(true, true, true);
 
   un_vector.AddCut({AnalysisTree::Variable("mdc_vtx_tracks", "geant_pid"),
                     [](double pid) { return abs(pid - 14.0) < 0.1; }, "cut on proton pid"});
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig qn_mdc("M",
                                     {vtx_tracks, "phi"}, {"Ones"},
                                     {rapidity_axis});
-  qn_mdc.SetCorrectionSteps(true, false, false);
+  qn_mdc.SetCorrectionSteps(true, true, true);
   qn_mdc.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid"),
                     [](double pid) { return abs(pid - 14.0) < 0.1; }, "proton cut"} );
   qn_mdc.SetType(Qn::Stats::Weights::REFERENCE);
