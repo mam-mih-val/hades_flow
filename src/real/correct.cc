@@ -120,13 +120,13 @@ int main(int argc, char **argv) {
 
   AnalysisTree::Variable eta(vtx_tracks, "eta");
 
-  task->AddQAHistogram("u", {{vtx_tracks + "_rapidity", 200, -0.75+beam_rapidity, 0.75+beam_rapidity},
+  task->AddQAHistogram("u", {{"y_cm", 200, -0.75+beam_rapidity, 0.75+beam_rapidity},
                            {vtx_tracks + "_pT", 200, 0.0, 2.0}});
 
   task->AddQAHistogram("u", {{vtx_tracks + "_pT", 200, 0.0, 2.0},
                              {vtx_tracks + "_phi", 315, -3.15, 3.15}});
 
-  task->AddQAHistogram("u", {{vtx_tracks + "_rapidity", 100, -0.75+beam_rapidity, 0.75+beam_rapidity},
+  task->AddQAHistogram("u", {{"y_cm", 100, -0.75+beam_rapidity, 0.75+beam_rapidity},
                            {vtx_tracks + "_phi", 315, -3.15, 3.15}});
 
   // TODO fix hardcode, change according to data header's information
