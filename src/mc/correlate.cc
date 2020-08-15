@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
   const std::string& file{argv[1]};
   CorrelationTask st(file, "tree");
-  st.SetNonZeroOnly(false);
+  st.SetNonZeroOnly(true);
 
   auto start = std::chrono::system_clock::now();
   st.Run();

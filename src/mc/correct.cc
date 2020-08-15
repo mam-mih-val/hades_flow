@@ -8,8 +8,8 @@
 
 #include <AnalysisTree/Variable.hpp>
 
-#include "tools.h"
-#include "hades_cuts.h"
+#include <centrality.h>
+#include <cuts.h>
 
 int main(int argc, char **argv) {
   using namespace std;
@@ -26,43 +26,114 @@ int main(int argc, char **argv) {
   const string sim_event = "sim_header";
   const string wall_hits = "forward_wall_hits";
 
-  const float beam_y = 0.74;  //TODO read from DataHeader
-  // Configuration will be here
-  Qn::Axis<double> pt_axis("pT", 16, 0.0, 1.6);
-  Qn::Axis<double> rapidity_axis("rapidity", 15, -0.75 + beam_y, 0.75 + beam_y);
-
-
   AnalysisTree::Variable centrality("Centrality",
                                     {{event_header, "selected_tof_rpc_hits"}},
                                     [](const std::vector<double> &var){
-                                      return Tools::Instance()->GetCentrality()->GetCentrality(
-            var.at(0), Centrality::DATA::AuAu_1_23AGeV);});
+                                      return HadesUtils::Centrality::GetValue(var.at(0),
+                                                                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV);});
+
+  double beam_rapidity = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "DataHeader")->GetBeamRapidity();
+  std::string system = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "DataHeader")->GetSystem();
+
+  AnalysisTree::Variable y_cm("y_cm",
+                              {{vtx_tracks, "rapidity"}},
+                              [beam_rapidity](const std::vector<double> &var){
+                                return var.at(0)-beam_rapidity;
+                              });
+
+  AnalysisTree::Variable y_cm_gen("y_cm",
+                              {{sim_tracks, "rapidity"}},
+                              [beam_rapidity](const std::vector<double> &var){
+                                return var.at(0)-beam_rapidity;
+                              });
+
+  Qn::AxisConfig pt_axis({vtx_tracks, "pT"}, 16, 0.0, 1.6);
+  Qn::AxisConfig pt_axis_gen({sim_tracks, "pT"}, 16, 0.0, 1.6);
+  Qn::AxisConfig rapidity_axis(y_cm, 15, -0.75, 0.75);
+  Qn::AxisConfig rapidity_axis_gen(y_cm_gen, 15, -0.75, 0.75);
 
   auto* global_config = new Qn::GlobalConfig();
   global_config->AddEventVar(centrality);
   global_config->AddCorrectionAxis( {"Centrality", 8, 0.0, 40.0} );
   // un-vector from MDC
-  Qn::QvectorTracksConfig reco_vector("reco",
+  Qn::QvectorTracksConfig pdg_prim("PDG_Prim",
                                   {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  reco_vector.SetCorrectionSteps(false, false, false);
-  reco_vector.AddCut( {AnalysisTree::Variable(vtx_tracks,"geant_pid")},
-                 [](double pid) { return abs(pid - 14.0) < 0.1; } );
-  reco_vector.AddCut( {AnalysisTree::Variable(sim_tracks,"is_primary")},
-                 [](double flag) { return abs(flag - 1.0) < 0.1; } );
-  reco_vector.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(reco_vector);
+  pdg_prim.SetCorrectionSteps(false, false, false);
+  pdg_prim.AddCut( {{vtx_tracks, "geant_pid"},
+                       [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG-Prim, reco-pid"});
+  pdg_prim.AddCut( {{sim_tracks, "geant_pid"},
+                    [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG-Prim, sim-pid"});
+  pdg_prim.AddCut( {{sim_tracks, "is_primary"},
+                    [](double pid) { return abs(pid - 1.0) < 0.1; }, "PDG-Prim, cut on primary"});
+  pdg_prim.SetType(Qn::Stats::Weights::OBSERVABLE);
+  global_config->AddTrackQvector(pdg_prim);
 
-  Qn::QvectorTracksConfig sim_vector("sim",
-                                  {sim_tracks, "phi"}, {"Ones"},
+  Qn::QvectorTracksConfig pdg_sec("PDG_Sec",
+                                  {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  sim_vector.SetCorrectionSteps(false, false, false);
-  sim_vector.AddCut( {AnalysisTree::Variable(sim_tracks,"geant_pid")},
-                 [](double pid) { return abs(pid - 14.0) < 0.1; } );
-  sim_vector.AddCut( {AnalysisTree::Variable(sim_tracks,"is_primary")},
-                      [](double flag) { return abs(flag - 1.0) < 0.1; } );
-  sim_vector.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(sim_vector);
+  pdg_sec.SetCorrectionSteps(false, false, false);
+  pdg_sec.AddCut( {{vtx_tracks, "geant_pid"},
+                       [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG_Sec, cut on proton reco-pid"});
+  pdg_sec.AddCut( {{sim_tracks, "geant_pid"},
+                    [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG_Sec, cut on proton sim-pid"});
+  pdg_sec.AddCut( {{sim_tracks, "is_primary"},
+                    [](double pid) { return abs(pid - 0.0) < 0.1; }, "PDG_Sec, cut on not primary"});
+  pdg_sec.SetType(Qn::Stats::Weights::OBSERVABLE);
+  global_config->AddTrackQvector(pdg_sec);
+
+  Qn::QvectorTracksConfig pid_prim("PID_Prim",
+                                  {vtx_tracks, "phi"}, {"Ones"},
+                                  {pt_axis, rapidity_axis});
+  pid_prim.SetCorrectionSteps(false, false, false);
+  pid_prim.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
+                       [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Prim, cut on proton reco-pid"});
+  pid_prim.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
+                    [](double pid) { return abs(pid - 1.0) < 0.1; }, "PID_Prim, cut on primary"});
+  pid_prim.SetType(Qn::Stats::Weights::OBSERVABLE);
+  global_config->AddTrackQvector(pid_prim);
+
+  Qn::QvectorTracksConfig pid_sec("PID_Sec",
+                                  {vtx_tracks, "phi"}, {"Ones"},
+                                  {pt_axis, rapidity_axis});
+  pid_sec.SetCorrectionSteps(false, false, false);
+  pid_sec.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
+                       [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Sec, cut on proton reco-pid"});
+  pid_sec.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
+                    [](double pid) { return abs(pid - 0.0) < 0.1; }, "PID_Sec, cut on not primary"});
+  pid_sec.SetType(Qn::Stats::Weights::OBSERVABLE);
+  global_config->AddTrackQvector(pid_sec);
+
+  Qn::QvectorTracksConfig pid_reco("PID_Reco",
+                                  {vtx_tracks, "phi"}, {"Ones"},
+                                  {pt_axis, rapidity_axis});
+  pid_reco.SetCorrectionSteps(false, false, false);
+  pid_reco.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
+                       [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Reco, cut on proton reco-pid"});
+  pid_reco.SetType(Qn::Stats::Weights::OBSERVABLE);
+  global_config->AddTrackQvector(pid_reco);
+
+  Qn::QvectorTracksConfig gen_prim("GEN_Prim",
+                                  {sim_tracks, "phi"}, {"Ones"},
+                                  {pt_axis_gen, rapidity_axis_gen});
+  gen_prim.SetCorrectionSteps(false, false, false);
+  gen_prim.AddCut({AnalysisTree::Variable(sim_tracks, "geant_pid"),
+                   [](double pid) { return abs(pid - 14.0) < 0.1; }, "GEN_Prim, cut on proton sim-pid"});
+  gen_prim.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
+                    [](double pid) { return abs(pid - 1.0) < 0.1; }, "GEN_Prim, cut on primary"} );
+  gen_prim.SetType(Qn::Stats::Weights::OBSERVABLE);
+  global_config->AddTrackQvector(gen_prim);
+
+  Qn::QvectorTracksConfig gen_sec("GEN_Sec",
+                                  {sim_tracks, "phi"}, {"Ones"},
+                                  {pt_axis_gen, rapidity_axis_gen});
+  gen_sec.SetCorrectionSteps(false, false, false);
+  gen_sec.AddCut({AnalysisTree::Variable(sim_tracks, "geant_pid"),
+                   [](double pid) { return abs(pid - 14.0) < 0.1; }, "GEN_Sec, cut on proton sim-pid"});
+  gen_sec.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
+                    [](double pid) { return abs(pid - 0.0) < 0.1; }, "GEN_Sec, cut on is not primary"} );
+  gen_sec.SetType(Qn::Stats::Weights::OBSERVABLE);
+  global_config->AddTrackQvector(gen_sec);
 
   Qn::QvectorConfig psi_rp("psi_rp", {sim_event, "reaction_plane"}, {"Ones"});
   psi_rp.SetCorrectionSteps(false, false, false);
@@ -73,31 +144,16 @@ int main(int argc, char **argv) {
   Qn::CorrectTaskManager task_manager({file_list}, {"hades_analysis_tree"});
   auto* task = new Qn::CorrectionTask(global_config);
 
-  task->AddQAHistogram("reco", {{vtx_tracks + "_rapidity", 200, -0.75+beam_y, 0.75+beam_y},
-                           {vtx_tracks + "_pT", 200, 0.0, 2.0}});
-  task->AddQAHistogram("reco", {{vtx_tracks + "_pT", 200, 0.0, 2.0},
-                             {vtx_tracks + "_phi", 315, -3.15, 3.15}});
-  task->AddQAHistogram("reco", {{vtx_tracks + "_rapidity", 100, -0.75+beam_y, 0.75+beam_y},
-                           {vtx_tracks + "_phi", 315, -3.15, 3.15}});
-
-  task->AddQAHistogram("sim", {{sim_tracks + "_rapidity", 200, -0.75+beam_y, 0.75+beam_y},
-                           {vtx_tracks + "_pT", 200, 0.0, 2.0}});
-  task->AddQAHistogram("sim", {{sim_tracks + "_pT", 200, 0.0, 2.0},
-                             {vtx_tracks + "_phi", 315, -3.15, 3.15}});
-  task->AddQAHistogram("sim", {{sim_tracks + "_rapidity", 100, -0.75+beam_y, 0.75+beam_y},
-                           {vtx_tracks + "_phi", 315, -3.15, 3.15}});
-
-//  task_manager.AddBranchCut(AnalysisTree::GetHadesTrackCuts(vtx_tracks));
-//  task_manager.AddBranchCut(AnalysisTree::GetHadesEventCuts(event_header));
+  task_manager.SetEventCuts(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::EVENT_HEADER,
+                                                  HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
+  task_manager.AddBranchCut(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::MDC_TRACKS,
+                                                  HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
+  task_manager.AddBranchCut(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::META_HITS,
+                                                  HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
 
   task_manager.AddTask(task);
   task_manager.Init();
-  auto start = std::chrono::system_clock::now();
   task_manager.Run(1000);
   task_manager.Finish();
-  auto end = std::chrono::system_clock::now();
-  std::chrono::duration<double> elapsed_seconds = end - start;
-  std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";
-//  std::cout << ((double) n_events)*3.6 /elapsed_seconds.count() << "K events per hour\n";
   return 0;
 }
