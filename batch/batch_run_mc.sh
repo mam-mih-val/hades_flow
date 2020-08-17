@@ -27,19 +27,19 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lustre/nyx/hades/user/mmamaev/install/A
 echo "loading " $ownroot
 source $ownroot
 
-echo "executing $build_dir/correct_mc list.txt"
-$build_dir/correct_mc list.txt
+echo "executing $build_dir/mc_correct list.txt"
+$build_dir/mc_correct list.txt
 mv correction_out.root correction_in.root
 
-echo "executing $build_dir/correct_mc list.txt"
-$build_dir/correct_mc list.txt
+echo "executing $build_dir/mc_correct list.txt"
+$build_dir/mc_correct list.txt
 mv correction_out.root correction_in.root
 
-echo "executing $build_dir/correct_mc list.txt"
-$build_dir/correct_mc list.txt
+echo "executing $build_dir/mc_correct list.txt"
+$build_dir/mc_correct list.txt
 mv correction_out.root correction_in.root
 
-echo "executing $build_dir/correlate_mc correction_out.root"
-$build_dir/correlate_mc correction_in.root
+echo "executing $build_dir/mc_correlate correction_out.root"
+$build_dir/mc_correlate correction_in.root
 
 echo JOB FINISHED!
