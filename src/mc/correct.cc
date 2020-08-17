@@ -1,5 +1,4 @@
 #include <iostream>
-#include <chrono>
 
 #include <GlobalConfig.h>
 
@@ -24,16 +23,22 @@ int main(int argc, char **argv) {
   const string vtx_tracks = "mdc_vtx_tracks";
   const string sim_tracks = "sim_tracks";
   const string sim_event = "sim_header";
-  const string wall_hits = "forward_wall_hits";
 
   AnalysisTree::Variable centrality("Centrality",
                                     {{event_header, "selected_tof_rpc_hits"}},
                                     [](const std::vector<double> &var){
                                       return HadesUtils::Centrality::GetValue(var.at(0),
                                                                               HadesUtils::DATA_TYPE::AuAu_1_23AGeV);});
-
-  double beam_rapidity = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "DataHeader")->GetBeamRapidity();
-  std::string system = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "DataHeader")->GetSystem();
+  double beam_rapidity;
+  try {
+    beam_rapidity =
+        AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(
+            file_list, "DataHeader")->GetBeamRapidity();
+  } catch (const std::runtime_error& e) {
+    beam_rapidity =
+        AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(
+            file_list, "data_information")->GetBeamRapidity();
+  }
 
   AnalysisTree::Variable y_cm("y_cm",
                               {{vtx_tracks, "rapidity"}},
@@ -41,7 +46,7 @@ int main(int argc, char **argv) {
                                 return var.at(0)-beam_rapidity;
                               });
 
-  AnalysisTree::Variable y_cm_gen("y_cm",
+  AnalysisTree::Variable y_cm_gen("y_cm_gen",
                               {{sim_tracks, "rapidity"}},
                               [beam_rapidity](const std::vector<double> &var){
                                 return var.at(0)-beam_rapidity;
@@ -59,7 +64,7 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig pdg_prim("PDG_Prim",
                                   {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  pdg_prim.SetCorrectionSteps(false, false, false);
+  pdg_prim.SetCorrectionSteps(true, false, false);
   pdg_prim.AddCut( {{vtx_tracks, "geant_pid"},
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG-Prim, reco-pid"});
   pdg_prim.AddCut( {{sim_tracks, "geant_pid"},
@@ -72,7 +77,7 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig pdg_sec("PDG_Sec",
                                   {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  pdg_sec.SetCorrectionSteps(false, false, false);
+  pdg_sec.SetCorrectionSteps(true, false, false);
   pdg_sec.AddCut( {{vtx_tracks, "geant_pid"},
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG_Sec, cut on proton reco-pid"});
   pdg_sec.AddCut( {{sim_tracks, "geant_pid"},
@@ -85,7 +90,7 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig pid_prim("PID_Prim",
                                   {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  pid_prim.SetCorrectionSteps(false, false, false);
+  pid_prim.SetCorrectionSteps(true, false, false);
   pid_prim.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Prim, cut on proton reco-pid"});
   pid_prim.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
@@ -96,7 +101,7 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig pid_sec("PID_Sec",
                                   {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  pid_sec.SetCorrectionSteps(false, false, false);
+  pid_sec.SetCorrectionSteps(true, false, false);
   pid_sec.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Sec, cut on proton reco-pid"});
   pid_sec.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
@@ -107,7 +112,7 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig pid_reco("PID_Reco",
                                   {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  pid_reco.SetCorrectionSteps(false, false, false);
+  pid_reco.SetCorrectionSteps(true, false, false);
   pid_reco.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Reco, cut on proton reco-pid"});
   pid_reco.SetType(Qn::Stats::Weights::OBSERVABLE);
@@ -153,7 +158,7 @@ int main(int argc, char **argv) {
 
   task_manager.AddTask(task);
   task_manager.Init();
-  task_manager.Run(1000);
+  task_manager.Run(-1);
   task_manager.Finish();
   return 0;
 }
