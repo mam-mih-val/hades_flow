@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
   // un-vector from MDC
   Qn::QvectorTracksConfig pdg_prim("PDG_Prim",
                                   {vtx_tracks, "phi"}, {"Ones"},
-                                  {pt_axis, rapidity_axis});
+                                  {pt_axis_gen, rapidity_axis_gen});
   pdg_prim.SetCorrectionSteps(true, false, false);
   pdg_prim.AddCut( {{vtx_tracks, "geant_pid"},
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG-Prim, reco-pid"});
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
   Qn::QvectorTracksConfig pdg_sec("PDG_Sec",
                                   {vtx_tracks, "phi"}, {"Ones"},
-                                  {pt_axis, rapidity_axis});
+                                  {pt_axis_gen, rapidity_axis_gen});
   pdg_sec.SetCorrectionSteps(true, false, false);
   pdg_sec.AddCut( {{vtx_tracks, "geant_pid"},
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG_Sec, cut on proton reco-pid"});
