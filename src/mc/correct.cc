@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
   global_config->AddCorrectionAxis( {"Centrality", 8, 0.0, 40.0} );
   // un-vector from MDC
   Qn::QvectorTracksConfig pdg_prim("PDG_Prim",
-                                  {vtx_tracks, "phi"}, {"Ones"},
+                                  {sim_tracks, "phi"}, {"Ones"},
                                   {pt_axis_gen, rapidity_axis_gen});
   pdg_prim.SetCorrectionSteps(true, false, false);
   pdg_prim.AddCut( {{vtx_tracks, "geant_pid"},
@@ -89,19 +89,6 @@ int main(int argc, char **argv) {
   pdg_prim.SetType(Qn::Stats::Weights::OBSERVABLE);
   global_config->AddTrackQvector(pdg_prim);
 
-  Qn::QvectorTracksConfig pdg_sec("PDG_Sec",
-                                  {vtx_tracks, "phi"}, {"Ones"},
-                                  {pt_axis_gen, rapidity_axis_gen});
-  pdg_sec.SetCorrectionSteps(true, false, false);
-  pdg_sec.AddCut( {{vtx_tracks, "geant_pid"},
-                       [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG_Sec, cut on proton reco-pid"});
-  pdg_sec.AddCut( {{sim_tracks, "geant_pid"},
-                    [](double pid) { return abs(pid - 14.0) < 0.1; }, "PDG_Sec, cut on proton sim-pid"});
-  pdg_sec.AddCut( {{sim_tracks, "is_primary"},
-                    [](double pid) { return abs(pid - 0.0) < 0.1; }, "PDG_Sec, cut on not primary"});
-  pdg_sec.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(pdg_sec);
-
   Qn::QvectorTracksConfig pid_prim("PID_Prim",
                                   {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
@@ -112,17 +99,6 @@ int main(int argc, char **argv) {
                     [](double pid) { return abs(pid - 1.0) < 0.1; }, "PID_Prim, cut on primary"});
   pid_prim.SetType(Qn::Stats::Weights::OBSERVABLE);
   global_config->AddTrackQvector(pid_prim);
-
-  Qn::QvectorTracksConfig pid_sec("PID_Sec",
-                                  {vtx_tracks, "phi"}, {"Ones"},
-                                  {pt_axis, rapidity_axis});
-  pid_sec.SetCorrectionSteps(true, false, false);
-  pid_sec.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
-                       [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Sec, cut on proton reco-pid"});
-  pid_sec.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
-                    [](double pid) { return abs(pid - 0.0) < 0.1; }, "PID_Sec, cut on not primary"});
-  pid_sec.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(pid_sec);
 
   Qn::QvectorTracksConfig pid_reco("PID_Reco",
                                   {vtx_tracks, "phi"}, {"Ones"},
