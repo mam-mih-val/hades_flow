@@ -9,15 +9,17 @@
 
 #include <centrality.h>
 #include <cuts.h>
+#include <corrections.h>
 
 int main(int argc, char **argv) {
   using namespace std;
-  if(argc < 1){
+  if(argc < 2){
     std::cout << "Error! Please use " << std::endl;
     std::cout << " ./correct filelist.txt path/to/efficiency.root" << std::endl;
     exit(EXIT_FAILURE);
   }
   const string file_list = argv[1];
+  const string eff_file = argv[2];
 
   const string event_header = "event_header";
   const string vtx_tracks = "mdc_vtx_tracks";
@@ -29,6 +31,19 @@ int main(int argc, char **argv) {
                                     [](const std::vector<double> &var){
                                       return HadesUtils::Centrality::GetValue(var.at(0),
                                                                               HadesUtils::DATA_TYPE::AuAu_1_23AGeV);});
+  HadesUtils::Corrections::ReadMaps(eff_file);
+  AnalysisTree::Variable efficiency("efficiency",
+                                    {{event_header, "selected_tof_rpc_hits"},
+                                     {sim_tracks, "rapidity"},
+                                     {sim_tracks, "pT"}},
+                                    [](const std::vector<double> &var){
+                                      auto cent_class = HadesUtils::Centrality::GetClass(var.at(0),
+                                                                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV);
+                                      auto pT = var.at(2);
+                                      auto y = var.at(1);
+                                      auto eff = HadesUtils::Corrections::GetEfficiency(cent_class, pT, y);
+                                      return 1/eff;
+                                    });
   double beam_rapidity;
   try {
     beam_rapidity =
