@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
   const string file_list = argv[1];
-  const string eff_file = argv[2];
+//  const string eff_file = argv[2];
 
   const string event_header = "event_header";
   const string vtx_tracks = "mdc_vtx_tracks";
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
                                     [](const std::vector<double> &var){
                                       return HadesUtils::Centrality::GetValue(var.at(0),
                                                                               HadesUtils::DATA_TYPE::AuAu_1_23AGeV);});
-  HadesUtils::Corrections::ReadMaps(eff_file);
+//  HadesUtils::Corrections::ReadMaps(eff_file);
   AnalysisTree::Variable efficiency("efficiency",
                                     {{event_header, "selected_tof_rpc_hits"},
                                      {sim_tracks, "rapidity"},
