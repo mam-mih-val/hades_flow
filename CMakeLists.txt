@@ -38,11 +38,6 @@ link_directories(
 )
 add_definitions(${ROOT_CXX_FLAGS})
 
-set (SOURCES
-        src/acceptance_correction.cc
-        src/tools.cc
-        )
-
 add_executable(correct src/real/correct.cc )
 target_link_libraries(correct QnToolsCorrection QnToolsBase FlowCorrect FlowBase AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES}
         $ENV{HadesUtils_DIR}/lib/libHadesUtils.so)

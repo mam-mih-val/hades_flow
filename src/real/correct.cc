@@ -22,8 +22,6 @@ int main(int argc, char **argv) {
 
   const string event_header = "event_header";
   const string vtx_tracks = "mdc_vtx_tracks";
-  const string sim_tracks = "sim_tracks";
-  const string sim_event = "sim_header";
   const string wall_hits = "forward_wall_hits";
 
   // Configuration will be here
@@ -61,7 +59,7 @@ int main(int argc, char **argv) {
   // Q-vectors from Forward Wall
   Qn::QvectorTracksConfig qn_wall_1("W1", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_1.SetCorrectionSteps(true, false, false);
+  qn_wall_1.SetCorrectionSteps(true, true, true);
   qn_wall_1.AddCut({{wall_hits, "ring"},
                     [](double value) { return 1.0 <= value && value <= 5.0; }, "cut on first SE"});
   qn_wall_1.SetType(Qn::Stats::Weights::REFERENCE);
@@ -69,7 +67,7 @@ int main(int argc, char **argv) {
 
   Qn::QvectorTracksConfig qn_wall_2("W2", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_2.SetCorrectionSteps(true, false, false);
+  qn_wall_2.SetCorrectionSteps(true, true, true);
   qn_wall_2.AddCut({{wall_hits, "ring"},
                     [](double value) { return 6.0 <= value && value <= 7.0; }, "cut on second SE"});
   qn_wall_2.SetType(Qn::Stats::Weights::REFERENCE);
@@ -77,7 +75,7 @@ int main(int argc, char **argv) {
 
   Qn::QvectorTracksConfig qn_wall_3("W3", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_3.SetCorrectionSteps(true, false, false);
+  qn_wall_3.SetCorrectionSteps(true, true, true);
   qn_wall_3.AddCut({{wall_hits, "ring"},
                       [](double value){ return 8.0 <= value && value <= 10.0;}, "cut on third SE"});
   qn_wall_3.SetType(Qn::Stats::Weights::REFERENCE);
