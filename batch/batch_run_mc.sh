@@ -27,16 +27,16 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lustre/nyx/hades/user/mmamaev/install/A
 echo "loading " $ownroot
 source $ownroot
 
-echo "executing $build_dir/mc_correct list.txt"
-$build_dir/mc_correct list.txt
+echo "executing $build_dir/mc_correct list.txt /lustre/nyx/hades/user/mmamaev/hades_flow/src/param/efficiency_out.root"
+$build_dir/mc_correct list.txt /lustre/nyx/hades/user/mmamaev/hades_flow/src/param/efficiency_out.root
 mv correction_out.root correction_in.root
 
-echo "executing $build_dir/mc_correct list.txt"
-$build_dir/mc_correct list.txt
+echo "executing $build_dir/mc_correct list.txt /lustre/nyx/hades/user/mmamaev/hades_flow/src/param/efficiency_out.root"
+$build_dir/mc_correct list.txt /lustre/nyx/hades/user/mmamaev/hades_flow/src/param/efficiency_out.root
 mv correction_out.root correction_in.root
 
-echo "executing $build_dir/mc_correct list.txt"
-$build_dir/mc_correct list.txt
+echo "executing $build_dir/mc_correct list.txt /lustre/nyx/hades/user/mmamaev/hades_flow/src/param/efficiency_out.root"
+$build_dir/mc_correct list.txt /lustre/nyx/hades/user/mmamaev/hades_flow/src/param/efficiency_out.root
 mv correction_out.root correction_in.root
 
 echo "executing $build_dir/mc_correlate correction_out.root"
