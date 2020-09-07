@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
                                       auto y = var.at(0);
                                       auto pT = var.at(1);
                                       auto eff = HadesUtils::Corrections::GetEfficiency(0, pT, y);
-                                      if( eff < 1e-2 )
+                                      if( eff < 1e-4 )
                                         return 0.0;
                                       return 1.0/eff;
                                     });
