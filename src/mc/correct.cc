@@ -33,17 +33,16 @@ int main(int argc, char **argv) {
                                                                               HadesUtils::DATA_TYPE::AuAu_1_23AGeV);});
   HadesUtils::Corrections::ReadMaps(eff_file);
   AnalysisTree::Variable efficiency("efficiency",
-                                    {{event_header, "selected_tof_rpc_hits"},
-                                     {vtx_tracks, "rapidity"},
+                                    {{vtx_tracks, "rapidity"},
                                      {vtx_tracks, "pT"}},
                                     [](const std::vector<double> &var){
-                                      auto cent_class = HadesUtils::Centrality::GetClass(var.at(0),
-                                                                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV);
-                                      if( cent_class > 7 )
-                                        return 1.0;
-                                      auto pT = var.at(2);
-                                      auto y = var.at(1);
-                                      auto eff = HadesUtils::Corrections::GetEfficiency(cent_class, pT, y);
+//                                      auto cent_class = HadesUtils::Centrality::GetClass(var.at(0),
+//                                                                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV);
+//                                      if( cent_class > 7 )
+//                                        return 1.0;
+                                      auto y = var.at(0);
+                                      auto pT = var.at(1);
+                                      auto eff = HadesUtils::Corrections::GetEfficiency(0, pT, y);
                                       if( eff < 1e-2 )
                                         return 0.0;
                                       return 1.0/eff;
@@ -84,7 +83,7 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig pid_reco_eff("PID_Eff_Corr",
                                   {vtx_tracks, "phi"}, efficiency,
                                   {pt_axis, rapidity_axis});
-  pid_reco_eff.SetCorrectionSteps(true, false, false);
+  pid_reco_eff.SetCorrectionSteps(false, false, false);
   pid_reco_eff.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Eff_Corr, cut on proton reco-pid"});
   pid_reco_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
@@ -93,11 +92,11 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig pid_reco_no_eff("PID_No_Eff_Corr",
                                   {vtx_tracks, "phi"}, {"Ones"},
                                   {pt_axis, rapidity_axis});
-  pid_reco_no_eff.SetCorrectionSteps(true, false, false);
+  pid_reco_no_eff.SetCorrectionSteps(false, false, false);
   pid_reco_no_eff.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_No_Eff_Corr, cut on proton reco-pid"});
   pid_reco_no_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
-//  global_config->AddTrackQvector(pid_reco_no_eff);
+  global_config->AddTrackQvector(pid_reco_no_eff);
 
   Qn::QvectorTracksConfig gen_prim("GEN_Prim",
                                   {sim_tracks, "phi"}, {"Ones"},
@@ -139,7 +138,7 @@ int main(int argc, char **argv) {
 
   task_manager.AddTask(task);
   task_manager.Init();
-  task_manager.Run(-1);
+  task_manager.Run(1000);
   task_manager.Finish();
   return 0;
 }
