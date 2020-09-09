@@ -59,6 +59,10 @@ int main(int argc, char **argv) {
                                       auto y = var.at(0)-beam_rapidity;
                                       auto pT = var.at(1);
                                       auto eff = HadesUtils::Corrections::GetEfficiency(4, pT, y); // 20-25%
+                                      if( eff < 0.3 )
+                                        return 0.0;
+                                      if( eff > 1.0 )
+                                        return 0.0;
                                       return 1.0/eff;
                                     });
 
