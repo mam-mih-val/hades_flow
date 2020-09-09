@@ -32,21 +32,6 @@ int main(int argc, char **argv) {
                                       return HadesUtils::Centrality::GetValue(var.at(0),
                                                                               HadesUtils::DATA_TYPE::AuAu_1_23AGeV);});
   HadesUtils::Corrections::ReadMaps(eff_file);
-  AnalysisTree::Variable efficiency("efficiency",
-                                    {{vtx_tracks, "rapidity"},
-                                     {vtx_tracks, "pT"}},
-                                    [](const std::vector<double> &var){
-//                                      auto cent_class = HadesUtils::Centrality::GetClass(var.at(0),
-//                                                                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV);
-//                                      if( cent_class > 7 )
-//                                        return 1.0;
-                                      auto y = var.at(0);
-                                      auto pT = var.at(1);
-                                      auto eff = HadesUtils::Corrections::GetEfficiency(0, pT, y);
-                                      if( eff < 1e-4 )
-                                        return 0.0;
-                                      return 1.0/eff;
-                                    });
   double beam_rapidity;
   try {
     beam_rapidity =
@@ -63,6 +48,19 @@ int main(int argc, char **argv) {
                               [beam_rapidity](const std::vector<double> &var){
                                 return var.at(0)-beam_rapidity;
                               });
+  AnalysisTree::Variable efficiency("efficiency",
+                                    {{vtx_tracks, "rapidity"},
+                                     {vtx_tracks, "pT"}},
+                                    [beam_rapidity](const std::vector<double> &var){
+//                                      auto cent_class = HadesUtils::Centrality::GetClass(var.at(0),
+//                                                                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV);
+//                                      if( cent_class > 7 )
+//                                        return 1.0;
+                                      auto y = var.at(0)-beam_rapidity;
+                                      auto pT = var.at(1);
+                                      auto eff = HadesUtils::Corrections::GetEfficiency(4, pT, y); // 20-25%
+                                      return 1.0/eff;
+                                    });
 
   AnalysisTree::Variable y_cm_gen("y_cm_gen",
                               {{sim_tracks, "rapidity"}},
