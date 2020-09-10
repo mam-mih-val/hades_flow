@@ -96,8 +96,8 @@ int main(int argc, char **argv) {
   global_config->AddTrackQvector(pid_reco_eff);
 
   Qn::QvectorTracksConfig pid_reco_no_eff("PID_No_Eff_Corr",
-                                  {vtx_tracks, "phi"}, {"Ones"},
-                                  {pt_axis, rapidity_axis});
+                                          {sim_tracks, "phi"}, {"Ones"},
+                                          {pt_axis_gen, rapidity_axis_gen});
   pid_reco_no_eff.SetCorrectionSteps(true, false, false);
   pid_reco_no_eff.AddCut( {AnalysisTree::Variable(sim_tracks, "geant_pid"),
                         [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Eff_Corr, cut on proton reco-pid"});
