@@ -88,6 +88,8 @@ int main(int argc, char **argv) {
   pid_reco_eff.SetCorrectionSteps(true, false, false);
   pid_reco_eff.AddCut( {AnalysisTree::Variable(sim_tracks, "geant_pid"),
                        [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Eff_Corr, cut on proton reco-pid"});
+  pid_reco_eff.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
+                       [](double pid) { return abs(pid - 1.0) < 0.1; }, "PID_Eff_Corr, cut on proton reco-pid"});
   pid_reco_eff.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                        [](double pid) { return true; }, "PID_Eff_Corr, cut on proton reco-pid"});
   pid_reco_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
@@ -99,6 +101,8 @@ int main(int argc, char **argv) {
   pid_reco_no_eff.SetCorrectionSteps(true, false, false);
   pid_reco_no_eff.AddCut( {AnalysisTree::Variable(sim_tracks, "geant_pid"),
                         [](double pid) { return abs(pid - 14.0) < 0.1; }, "PID_Eff_Corr, cut on proton reco-pid"});
+  pid_reco_no_eff.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
+                        [](double pid) { return abs(pid - 1.0) < 0.1; }, "PID_Eff_Corr, cut on proton reco-pid"});
   pid_reco_no_eff.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                         [](double pid) { return true; }, "PID_Eff_Corr, cut on proton reco-pid"});
   pid_reco_no_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
