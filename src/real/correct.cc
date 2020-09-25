@@ -1,9 +1,9 @@
 #include <iostream>
+#include <boost/program_options.hpp>
 
-#include <GlobalConfig.h>
-
-#include <CorrectTaskManager.h>
 #include <QnTools/Stats.hpp>
+#include <GlobalConfig.h>
+#include <CorrectTaskManager.h>
 
 #include <AnalysisTree/Variable.hpp>
 
@@ -11,19 +11,34 @@
 
 int main(int argc, char **argv) {
   using namespace std;
-  if(argc < 1){
-    std::cout << "Error! Please use " << std::endl;
-    std::cout << " ./correct filelist.txt path/to/efficiency.root" << std::endl;
-    exit(EXIT_FAILURE);
+  namespace po = boost::program_options;
+  if(argc < 2){
+    throw std::runtime_error("No arguments were provided. Use ./correct --help to get more information.");
   }
-  const string file_list = argv[1];
+
+  std::string file_list;
+  po::options_description options("Options");
+  options.add_options()
+      ("help,h", "Help screen")
+      ("debug,d", "Debug option: 1K events, no corrections of Q-vectors")
+      ("input,i", po::value<std::string>(&file_list),
+       "Set path to input configuration");
+  po::variables_map vm;
+  po::parsed_options parsed = po::command_line_parser(argc, argv).options(options).run();
+  po::store(parsed, vm);
+  po::notify(vm);
+  if (vm.count("help")){
+    std::cout << options << std::endl;
+    return 0;
+  }
+  bool is_debug=vm.count("debug");
 
   const string event_header = "event_header";
   const string vtx_tracks = "mdc_vtx_tracks";
   const string wall_hits = "forward_wall_hits";
 
-  double beam_rapidity = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "data_information")->GetBeamRapidity();
-  std::string system = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "data_information")->GetSystem();
+  double beam_rapidity = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "DataHeader")->GetBeamRapidity();
+  std::string system = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "DataHeader")->GetSystem();
 
   AnalysisTree::Variable y_cm("y_cm",
                               {{vtx_tracks, "rapidity"}},
@@ -34,12 +49,14 @@ int main(int argc, char **argv) {
   Qn::AxisConfig pt_axis({vtx_tracks, "pT"}, 16, 0.0, 1.6);
   Qn::AxisConfig rapidity_axis(y_cm, 15, -0.75, 0.75);
   auto* global_config = new Qn::GlobalConfig();
-  global_config->AddEventVar({"event_header", "selected_tof_rpc_hits_centrality"});
+  global_config->AddEventVar({event_header, "selected_tof_rpc_hits_centrality"});
   global_config->AddCorrectionAxis( {"event_header_selected_tof_rpc_hits_centrality", 8, 0.0, 40.0} );
   // un-vector from MDC
   Qn::QvectorTracksConfig un_vector("u",{vtx_tracks, "phi"}, {"Ones"},
                                     {pt_axis,rapidity_axis});
   un_vector.SetCorrectionSteps(true, true, true);
+  if( is_debug )
+    un_vector.SetCorrectionSteps(false, false, false);
 
   un_vector.AddCut({AnalysisTree::Variable("mdc_vtx_tracks", "geant_pid"),
                     [](double pid) { return abs(pid - 14.0) < 0.1; }, "cut on proton pid"});
@@ -50,6 +67,8 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig qn_wall_1("W1", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
   qn_wall_1.SetCorrectionSteps(true, true, true);
+  if( is_debug )
+    qn_wall_1.SetCorrectionSteps(false, false, false);
   qn_wall_1.AddCut({{wall_hits, "ring"},
                     [](double value) { return 1.0 <= value && value <= 5.0; }, "cut on first SE"});
   qn_wall_1.SetType(Qn::Stats::Weights::REFERENCE);
@@ -58,6 +77,8 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig qn_wall_2("W2", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
   qn_wall_2.SetCorrectionSteps(true, true, true);
+  if( is_debug )
+    qn_wall_2.SetCorrectionSteps(false, false, false);
   qn_wall_2.AddCut({{wall_hits, "ring"},
                     [](double value) { return 6.0 <= value && value <= 7.0; }, "cut on second SE"});
   qn_wall_2.SetType(Qn::Stats::Weights::REFERENCE);
@@ -66,6 +87,8 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig qn_wall_3("W3", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
   qn_wall_3.SetCorrectionSteps(true, true, true);
+  if( is_debug )
+    qn_wall_3.SetCorrectionSteps(false, false, false);
   qn_wall_3.AddCut({{wall_hits, "ring"},
                       [](double value){ return 8.0 <= value && value <= 10.0;}, "cut on third SE"});
   qn_wall_3.SetType(Qn::Stats::Weights::REFERENCE);
@@ -74,6 +97,8 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig qn_rs1("R1", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
   qn_rs1.SetCorrectionSteps(true, false, false);
+  if( is_debug )
+    qn_rs1.SetCorrectionSteps(false, false, false);
   qn_rs1.AddCut({{wall_hits, "rnd_sub"},
                       [](double value){ return fabs(value - 0.0) < 0.1;},"cut on first RND-SE"});
   qn_rs1.SetType(Qn::Stats::Weights::REFERENCE);
@@ -81,6 +106,8 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig qn_rs2("R2", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
   qn_rs2.SetCorrectionSteps(true, false, false);
+  if( is_debug )
+    qn_rs2.SetCorrectionSteps(false, false, false);
   qn_rs2.AddCut({{wall_hits, "rnd_sub"},
                       [](double value){ return fabs(value - 1.0) < 0.1;}, "cut on second RND-SE"});
   global_config->AddTrackQvector(qn_rs2);
@@ -88,6 +115,8 @@ int main(int argc, char **argv) {
   Qn::QvectorTracksConfig qn_full("F", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
   qn_full.SetCorrectionSteps(true, false, false);
+  if( is_debug )
+    qn_full.SetCorrectionSteps(false, false, false);
   qn_full.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_full);
   // Q-vector from MDC
@@ -95,6 +124,8 @@ int main(int argc, char **argv) {
                                     {vtx_tracks, "phi"}, {"Ones"},
                                     {rapidity_axis});
   qn_mdc.SetCorrectionSteps(true, true, true);
+  if( is_debug )
+    qn_mdc.SetCorrectionSteps(false, false, false);
   qn_mdc.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid"),
                     [](double pid) { return abs(pid - 14.0) < 0.1; }, "proton cut"} );
   qn_mdc.SetType(Qn::Stats::Weights::REFERENCE);
@@ -116,8 +147,6 @@ int main(int argc, char **argv) {
 
   task->AddQAHistogram("u", {{"y_cm", 100, -0.75+beam_rapidity, 0.75+beam_rapidity},
                            {vtx_tracks + "_phi", 315, -3.15, 3.15}});
-
-  // TODO fix hardcode, change according to data header's information
 
   if( system == "Au+Au" ) {
     task_manager.SetEventCuts(
@@ -148,7 +177,10 @@ int main(int argc, char **argv) {
   }
   task_manager.AddTask(task);
   task_manager.Init();
-  task_manager.Run(-1);
+  if( is_debug )
+    task_manager.Run(10000);
+  else
+    task_manager.Run(-1);
   task_manager.Finish();
   return 0;
 }

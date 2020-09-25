@@ -11,6 +11,7 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{HadesUtils_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${AnalysisTree_HOME})
 list(APPEND CMAKE_PREFIX_PATH ${Flow_HOME})
 
+find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(ROOT REQUIRED COMPONENTS RIO Tree)
 find_package( AnalysisTree REQUIRED)
 find_package( Flow REQUIRED)
@@ -23,6 +24,7 @@ include_directories(
         ${CMAKE_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/src
         ${ROOT_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
         ${AnalysisTree_INCLUDE_DIR}
         ${Flow_INCLUDE_DIR}
         ${Flow_INCLUDE_DIR}/../external/include
@@ -40,14 +42,14 @@ add_definitions(${ROOT_CXX_FLAGS})
 
 add_executable(correct src/real/correct.cc )
 target_link_libraries(correct QnToolsCorrection QnToolsBase FlowCorrect FlowBase AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES}
-        $ENV{HadesUtils_DIR}/lib/libHadesUtils.so)
+        $ENV{HadesUtils_DIR}/lib/libHadesUtils.so ${Boost_LIBRARIES})
 
 add_executable(correlate src/real/correlate.cc)
 target_link_libraries(correlate QnToolsBase FlowBase FlowCorrelate AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES})
 
 add_executable(mc_correct src/mc/correct.cc )
 target_link_libraries(mc_correct QnToolsCorrection QnToolsBase FlowCorrect FlowBase AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES}
-        $ENV{HadesUtils_DIR}/lib/libHadesUtils.so)
+        $ENV{HadesUtils_DIR}/lib/libHadesUtils.so ${Boost_LIBRARIES})
 
 add_executable(mc_correlate src/mc/correlate.cc)
 target_link_libraries(mc_correlate QnToolsBase FlowBase FlowCorrelate AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES})
