@@ -41,15 +41,15 @@ link_directories(
 add_definitions(${ROOT_CXX_FLAGS})
 
 add_executable(correct src/real/correct.cc )
-target_link_libraries(correct QnToolsCorrection QnToolsBase FlowCorrect FlowBase AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES}
-        $ENV{HadesUtils_DIR}/lib/libHadesUtils.so ${Boost_LIBRARIES})
+target_link_libraries(correct  ${Boost_LIBRARIES} QnToolsCorrection QnToolsBase FlowCorrect FlowBase AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES}
+        $ENV{HadesUtils_DIR}/lib/libHadesUtils.so)
 
 add_executable(correlate src/real/correlate.cc)
 target_link_libraries(correlate QnToolsBase FlowBase FlowCorrelate AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES})
 
 add_executable(mc_correct src/mc/correct.cc )
 target_link_libraries(mc_correct QnToolsCorrection QnToolsBase FlowCorrect FlowBase AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES}
-        $ENV{HadesUtils_DIR}/lib/libHadesUtils.so ${Boost_LIBRARIES})
+        $ENV{HadesUtils_DIR}/lib/libHadesUtils.so)
 
 add_executable(mc_correlate src/mc/correlate.cc)
 target_link_libraries(mc_correlate QnToolsBase FlowBase FlowCorrelate AnalysisTreeBase AnalysisTreeInfra ${ROOT_LIBRARIES})
