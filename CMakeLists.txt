@@ -11,7 +11,7 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{HadesUtils_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${AnalysisTree_HOME})
 list(APPEND CMAKE_PREFIX_PATH ${Flow_HOME})
 
-find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(Boost REQUIRED COMPONENTS program_options regex )
 find_package(ROOT REQUIRED COMPONENTS RIO Tree)
 find_package( AnalysisTree REQUIRED)
 find_package( Flow REQUIRED)
