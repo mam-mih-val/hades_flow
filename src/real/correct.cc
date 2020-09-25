@@ -1,5 +1,4 @@
 #include <iostream>
-#include <chrono>
 
 #include <GlobalConfig.h>
 
@@ -8,7 +7,6 @@
 
 #include <AnalysisTree/Variable.hpp>
 
-#include <centrality.h>
 #include <cuts.h>
 
 int main(int argc, char **argv) {
@@ -24,14 +22,6 @@ int main(int argc, char **argv) {
   const string vtx_tracks = "mdc_vtx_tracks";
   const string wall_hits = "forward_wall_hits";
 
-  // Configuration will be here
-
-  AnalysisTree::Variable centrality("Centrality",
-                                    {{event_header, "selected_tof_rpc_hits"}},
-                                    [](const std::vector<double> &var){
-                                      return HadesUtils::Centrality::GetValue(var.at(0),
-                                                                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV);});
-
   double beam_rapidity = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "data_information")->GetBeamRapidity();
   std::string system = AnalysisTree::GetObjectFromFileList<AnalysisTree::DataHeader>(file_list, "data_information")->GetSystem();
 
@@ -44,8 +34,8 @@ int main(int argc, char **argv) {
   Qn::AxisConfig pt_axis({vtx_tracks, "pT"}, 16, 0.0, 1.6);
   Qn::AxisConfig rapidity_axis(y_cm, 15, -0.75, 0.75);
   auto* global_config = new Qn::GlobalConfig();
-  global_config->AddEventVar(centrality);
-  global_config->AddCorrectionAxis( {"Centrality", 8, 0.0, 40.0} );
+  global_config->AddEventVar({"event_header", "selected_tof_rpc_hits_centrality"});
+  global_config->AddCorrectionAxis( {"event_header_selected_tof_rpc_hits_centrality", 8, 0.0, 40.0} );
   // un-vector from MDC
   Qn::QvectorTracksConfig un_vector("u",{vtx_tracks, "phi"}, {"Ones"},
                                     {pt_axis,rapidity_axis});
@@ -128,15 +118,34 @@ int main(int argc, char **argv) {
                            {vtx_tracks + "_phi", 315, -3.15, 3.15}});
 
   // TODO fix hardcode, change according to data header's information
-  task_manager.SetEventCuts(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::EVENT_HEADER,
-                                                  HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
-  task_manager.AddBranchCut(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::MDC_TRACKS,
-                                                  HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
-  task_manager.AddBranchCut(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::META_HITS,
-                                                  HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
-  task_manager.AddBranchCut(HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::WALL_HITS,
-                                                  HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
 
+  if( system == "Au+Au" ) {
+    task_manager.SetEventCuts(
+        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::EVENT_HEADER,
+                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
+    task_manager.AddBranchCut(
+        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::MDC_TRACKS,
+                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
+    task_manager.AddBranchCut(
+        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::META_HITS,
+                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
+    task_manager.AddBranchCut(
+        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::WALL_HITS,
+                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
+  }else if( system=="Ag+Ag" ){
+    task_manager.SetEventCuts(
+        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::EVENT_HEADER,
+                              HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
+    task_manager.AddBranchCut(
+        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::MDC_TRACKS,
+                              HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
+    task_manager.AddBranchCut(
+        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::META_HITS,
+                              HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
+    task_manager.AddBranchCut(
+        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::WALL_HITS,
+                              HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
+  }
   task_manager.AddTask(task);
   task_manager.Init();
   task_manager.Run(-1);
