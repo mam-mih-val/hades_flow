@@ -36,6 +36,7 @@ link_directories(
         ${AnalysisTreeBase_LIBRARY_DIR}
         ${Flow_LIBRARY_DIR}
         ${Flow_INCLUDE_DIR}/../external/lib
+        ${Boost_LIBRARY_DIR}
         $ENV{HadesUtils_DIR}/lib
 )
 add_definitions(${ROOT_CXX_FLAGS})
