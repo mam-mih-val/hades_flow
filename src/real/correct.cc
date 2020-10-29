@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
                                 return var.at(0)-beam_rapidity;
                               });
 
-  Qn::AxisConfig pt_axis({vtx_tracks, "pT"}, 16, 0.0, 1.6);
+  Qn::AxisConfig pt_axis({vtx_tracks, "pT"}, 20, 0.0, 2.0);
   Qn::AxisConfig rapidity_axis(y_cm, 15, -0.75, 0.75);
   auto* global_config = new Qn::GlobalConfig();
   global_config->AddEventVar({event_header, "selected_tof_rpc_hits_centrality"});
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
   // Q-vectors from Forward Wall
   Qn::QvectorTracksConfig qn_wall_1("W1", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_1.SetCorrectionSteps(true, true, true);
+  qn_wall_1.SetCorrectionSteps(true, false, false);
   if( is_debug )
     qn_wall_1.SetCorrectionSteps(false, false, false);
   qn_wall_1.AddCut({{wall_hits, "ring"},
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
   Qn::QvectorTracksConfig qn_wall_2("W2", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_2.SetCorrectionSteps(true, true, true);
+  qn_wall_2.SetCorrectionSteps(true, false, false);
   if( is_debug )
     qn_wall_2.SetCorrectionSteps(false, false, false);
   qn_wall_2.AddCut({{wall_hits, "ring"},
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 
   Qn::QvectorTracksConfig qn_wall_3("W3", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_3.SetCorrectionSteps(true, true, true);
+  qn_wall_3.SetCorrectionSteps(true, false, false);
   if( is_debug )
     qn_wall_3.SetCorrectionSteps(false, false, false);
   qn_wall_3.AddCut({{wall_hits, "ring"},
@@ -130,6 +130,8 @@ int main(int argc, char **argv) {
                     [](double pid) { return abs(pid - 14.0) < 0.1; }, "proton cut"} );
   qn_mdc_f.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks", "rapidity"),
                     [](double rapidity) { return 1.09 < rapidity && rapidity < 1.29; }, "forward cut"} );
+  qn_mdc_f.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks", "pT"),
+                    [](double pT) { return 0.0 < pT && pT < 2.0; }, "forward cut"} );
   qn_mdc_f.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_mdc_f);
 
@@ -143,6 +145,8 @@ int main(int argc, char **argv) {
                     [](double pid) { return abs(pid - 14.0) < 0.1; }, "proton cut"} );
   qn_mdc_b.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks", "rapidity"),
                     [](double rapidity) { return 0.19 < rapidity && rapidity < 0.39; }, "backward cut"} );
+  qn_mdc_b.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks", "pT"),
+                    [](double pT) { return 0.0 < pT && pT < 2.0; }, "forward cut"} );
   qn_mdc_b.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_mdc_b);
 
