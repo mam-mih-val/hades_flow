@@ -120,16 +120,31 @@ int main(int argc, char **argv) {
   qn_full.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_full);
   // Q-vector from MDC
-  Qn::QvectorTracksConfig qn_mdc("M",
-                                    {vtx_tracks, "phi"}, {"Ones"},
-                                    {rapidity_axis});
-  qn_mdc.SetCorrectionSteps(true, true, true);
+  Qn::QvectorTracksConfig qn_mdc_f("Mf",
+                                    {vtx_tracks, "phi"},
+                                   {"Ones"}, {});
+  qn_mdc_f.SetCorrectionSteps(true, true, true);
   if( is_debug )
-    qn_mdc.SetCorrectionSteps(false, false, false);
-  qn_mdc.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks","geant_pid"),
+    qn_mdc_f.SetCorrectionSteps(false, false, false);
+  qn_mdc_f.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks", "geant_pid"),
                     [](double pid) { return abs(pid - 14.0) < 0.1; }, "proton cut"} );
-  qn_mdc.SetType(Qn::Stats::Weights::REFERENCE);
-  global_config->AddTrackQvector(qn_mdc);
+  qn_mdc_f.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks", "rapidity"),
+                    [](double rapidity) { return 1.09 < rapidity && rapidity < 1.29; }, "forward cut"} );
+  qn_mdc_f.SetType(Qn::Stats::Weights::REFERENCE);
+  global_config->AddTrackQvector(qn_mdc_f);
+
+  Qn::QvectorTracksConfig qn_mdc_b("Mb",
+                                    {vtx_tracks, "phi"},
+                                   {"Ones"}, {});
+  qn_mdc_b.SetCorrectionSteps(true, true, true);
+  if( is_debug )
+    qn_mdc_b.SetCorrectionSteps(false, false, false);
+  qn_mdc_b.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks", "geant_pid"),
+                    [](double pid) { return abs(pid - 14.0) < 0.1; }, "proton cut"} );
+  qn_mdc_b.AddCut( {AnalysisTree::Variable("mdc_vtx_tracks", "rapidity"),
+                    [](double rapidity) { return 0.19 < rapidity && rapidity < 0.39; }, "backward cut"} );
+  qn_mdc_b.SetType(Qn::Stats::Weights::REFERENCE);
+  global_config->AddTrackQvector(qn_mdc_b);
 
  // ***********************************************
   // first filelist should contain DataHeader
