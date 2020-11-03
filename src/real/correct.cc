@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
   // Q-vectors from Forward Wall
   Qn::QvectorTracksConfig qn_wall_1("W1", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_1.SetCorrectionSteps(true, false, false);
+  qn_wall_1.SetCorrectionSteps(true, true, true);
   if( is_debug )
     qn_wall_1.SetCorrectionSteps(false, false, false);
   qn_wall_1.AddCut({{wall_hits, "ring"},
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
                                        {wall_hits, "signal"},{});
   qn_wall_2.SetCorrectionSteps(true, false, false);
   if( is_debug )
-    qn_wall_2.SetCorrectionSteps(false, false, false);
+    qn_wall_2.SetCorrectionSteps(false, true, true);
   qn_wall_2.AddCut({{wall_hits, "ring"},
                     [](double value) { return 6.0 <= value && value <= 7.0; }, "cut on second SE"});
   qn_wall_2.SetType(Qn::Stats::Weights::REFERENCE);
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 
   Qn::QvectorTracksConfig qn_wall_3("W3", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_3.SetCorrectionSteps(true, false, false);
+  qn_wall_3.SetCorrectionSteps(true, true, true);
   if( is_debug )
     qn_wall_3.SetCorrectionSteps(false, false, false);
   qn_wall_3.AddCut({{wall_hits, "ring"},
