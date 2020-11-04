@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
   Qn::QvectorTracksConfig qn_wall_2("W2", {wall_hits, "phi"},
                                        {wall_hits, "signal"},{});
-  qn_wall_2.SetCorrectionSteps(true, false, false);
+  qn_wall_2.SetCorrectionSteps(true, true, true);
   if( is_debug )
     qn_wall_2.SetCorrectionSteps(false, true, true);
   qn_wall_2.AddCut({{wall_hits, "ring"},
