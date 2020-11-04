@@ -71,6 +71,10 @@ int main(int argc, char **argv) {
     qn_wall_1.SetCorrectionSteps(false, false, false);
   qn_wall_1.AddCut({{wall_hits, "ring"},
                     [](double value) { return 1.0 <= value && value <= 5.0; }, "cut on first SE"});
+  qn_wall_1.AddCut({{wall_hits, "beta"},
+                    [](double value) { return 0.84 <= value && value <= 1.0; }, "cut on beta first SE"});
+  qn_wall_1.AddCut({{wall_hits, "signal"},
+                    [](double value) { return 80.0 <= value && value <= 999.0; }, "cut on signal first SE"});
   qn_wall_1.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_1);
 
@@ -81,6 +85,10 @@ int main(int argc, char **argv) {
     qn_wall_2.SetCorrectionSteps(false, true, true);
   qn_wall_2.AddCut({{wall_hits, "ring"},
                     [](double value) { return 6.0 <= value && value <= 7.0; }, "cut on second SE"});
+  qn_wall_2.AddCut({{wall_hits, "beta"},
+                    [](double value) { return 0.85 <= value && value <= 1.0; }, "cut on beta second SE"});
+  qn_wall_2.AddCut({{wall_hits, "signal"},
+                    [](double value) { return 85.0 <= value && value <= 999.0; }, "cut on signal second SE"});
   qn_wall_2.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_2);
 
@@ -91,6 +99,10 @@ int main(int argc, char **argv) {
     qn_wall_3.SetCorrectionSteps(false, false, false);
   qn_wall_3.AddCut({{wall_hits, "ring"},
                       [](double value){ return 8.0 <= value && value <= 10.0;}, "cut on third SE"});
+  qn_wall_2.AddCut({{wall_hits, "beta"},
+                    [](double value) { return 0.80 <= value && value <= 1.0; }, "cut on beta third SE"});
+  qn_wall_2.AddCut({{wall_hits, "signal"},
+                    [](double value) { return 88.0 <= value && value <= 999.0; }, "cut on signal third SE"});
   qn_wall_3.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_3);
 
@@ -177,9 +189,9 @@ int main(int argc, char **argv) {
     task_manager.AddBranchCut(
         HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::META_HITS,
                               HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
-    task_manager.AddBranchCut(
-        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::WALL_HITS,
-                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
+//    task_manager.AddBranchCut(
+//        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::WALL_HITS,
+//                              HadesUtils::DATA_TYPE::AuAu_1_23AGeV));
   }else if( system=="Ag+Ag" ){
     task_manager.SetEventCuts(
         HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::EVENT_HEADER,
@@ -190,9 +202,9 @@ int main(int argc, char **argv) {
     task_manager.AddBranchCut(
         HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::META_HITS,
                               HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
-    task_manager.AddBranchCut(
-        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::WALL_HITS,
-                              HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
+//    task_manager.AddBranchCut(
+//        HadesUtils::Cuts::Get(HadesUtils::Cuts::BRANCH_TYPE::WALL_HITS,
+//                              HadesUtils::DATA_TYPE::AgAg_1_23AGeV));
   }
   task_manager.AddTask(task);
   task_manager.Init();
