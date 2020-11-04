@@ -99,9 +99,9 @@ int main(int argc, char **argv) {
     qn_wall_3.SetCorrectionSteps(false, false, false);
   qn_wall_3.AddCut({{wall_hits, "ring"},
                       [](double value){ return 8.0 <= value && value <= 10.0;}, "cut on third SE"});
-  qn_wall_2.AddCut({{wall_hits, "beta"},
+  qn_wall_3.AddCut({{wall_hits, "beta"},
                     [](double value) { return 0.80 <= value && value <= 1.0; }, "cut on beta third SE"});
-  qn_wall_2.AddCut({{wall_hits, "signal"},
+  qn_wall_3.AddCut({{wall_hits, "signal"},
                     [](double value) { return 88.0 <= value && value <= 999.0; }, "cut on signal third SE"});
   qn_wall_3.SetType(Qn::Stats::Weights::REFERENCE);
   global_config->AddTrackQvector(qn_wall_3);
