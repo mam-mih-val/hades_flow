@@ -72,8 +72,8 @@ int main(int argc, char **argv) {
                                 return var.at(0)-beam_rapidity;
                               });
 
-  Qn::AxisConfig pt_axis({vtx_tracks, "pT"}, 16, 0.0, 1.6);
-  Qn::AxisConfig pt_axis_gen({sim_tracks, "pT"}, 16, 0.0, 1.6);
+  Qn::AxisConfig pt_axis({vtx_tracks, "pT"}, 10, {0, 0.29375, 0.35625, 0.41875, 0.48125, 0.54375, 0.61875, 0.70625, 0.81875, 1.01875, 2.0});
+  Qn::AxisConfig pt_axis_gen({sim_tracks, "pT"}, 10, {0, 0.29375, 0.35625, 0.41875, 0.48125, 0.54375, 0.61875, 0.70625, 0.81875, 1.01875, 2.0});
   Qn::AxisConfig rapidity_axis(y_cm, 15, -0.75, 0.75);
   Qn::AxisConfig rapidity_axis_gen(y_cm_gen, 15, -0.75, 0.75);
 
