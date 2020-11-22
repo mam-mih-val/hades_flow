@@ -3,7 +3,7 @@
 format='+%Y/%m/%d-%H:%M:%S'
 
 date $format
-
+echo
 job_num=$(($SLURM_ARRAY_TASK_ID))
 
 filelist=$lists_dir/$job_num.list
@@ -43,3 +43,5 @@ echo "executing $build_dir/mc_correlate correction_out.root"
 $build_dir/mc_correlate correction_in.root
 
 echo JOB FINISHED!
+echo
+date $format
