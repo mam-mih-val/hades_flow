@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
   pid_reco_eff.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                        [](double pid) { return true; }, "PID_Eff_Corr, cut on proton reco-pid"});
   pid_reco_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(pid_reco_eff);
+//  global_config->AddTrackQvector(pid_reco_eff);
 
   Qn::QvectorTracksConfig pid_reco_no_eff("PID_No_Eff_Corr",
                                           {sim_tracks, "phi"}, {"Ones"},
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
   pid_reco_no_eff.AddCut( {AnalysisTree::Variable(vtx_tracks, "geant_pid"),
                         [](double pid) { return true; }, "PID_Eff_Corr, cut on proton reco-pid"});
   pid_reco_no_eff.SetType(Qn::Stats::Weights::OBSERVABLE);
-  global_config->AddTrackQvector(pid_reco_no_eff);
+//  global_config->AddTrackQvector(pid_reco_no_eff);
 
   Qn::QvectorTracksConfig gen_prim("GEN_Prim",
                                   {sim_tracks, "phi"}, {"Ones"},
@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
   gen_prim.AddCut( {AnalysisTree::Variable(sim_tracks, "is_primary"),
                     [](double pid) { return abs(pid - 1.0) < 0.1; }, "GEN_Prim, cut on primary"} );
   gen_prim.SetType(Qn::Stats::Weights::OBSERVABLE);
-//  global_config->AddTrackQvector(gen_prim);
+  global_config->AddTrackQvector(gen_prim);
 
   Qn::QvectorTracksConfig gen_sec("GEN_Sec",
                                   {sim_tracks, "phi"}, {"Ones"},

@@ -16,8 +16,8 @@ int main(int argc, char **argv) {
   const std::string& file{argv[1]};
   CorrelationTask st(file, "tree");
   st.SetNonZeroOnly(true);
-  st.AddQ2Q2Correlation("PID_Eff_Corr", "psi_rp");
-  st.AddQ2Q2Correlation("PID_No_Eff_Corr", "psi_rp");
+//  st.AddQ2Q2Correlation("PID_Eff_Corr", "psi_rp");
+//  st.AddQ2Q2Correlation("PID_No_Eff_Corr", "psi_rp");
 
   auto start = std::chrono::system_clock::now();
   st.Run();
